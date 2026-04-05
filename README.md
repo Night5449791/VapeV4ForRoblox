@@ -11,7 +11,7 @@
   Rise up to the top while remaining completely untouchable.
 </h2>
 
-## Contacts
+## Contacts (7granddadpgn)
 [Discord](https://discord.gg/5gJqhQmrdS)
 <br/>
 [Youtube](https://youtube.com/c/7GrandDadVape)
@@ -20,7 +20,7 @@
 1. Download the specific scripting utility of your choice.
 2. Execute the provided loadstring below.
 ```luau
-loadstring(game:HttpGet("https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/main/NewMainScript.lua", true))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua", true))()
 ```
 
 ## Possible Issues
@@ -31,14 +31,15 @@ Half of the time its usually the scripting utility at fault, please make sure th
 ### User Issues
 If its not the supposed utility at fault, please try some troubleshooting steps.
 1. Deleting the newvape folder (WITH THE GAME CLOSED).
-2. Making sure you have connection to [the main loadstring.](https://raw.githubusercontent.com/7GrandDadPGN/VapeV4ForRoblox/refs/heads/main/NewMainScript.lua)
+2. Making sure you have connection to [the main loadstring.](https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/refs/heads/main/NewMainScript.lua)
 3. Ensuring no external script is conflicting with vape.
 
 ## Developers & Credits
-[7GrandDad](https://github.com/7GrandDadPGN) - Lead maintainer of the project - vaperoblox on Discord
+[7GrandDad](https://github.com/7GrandDadPGN) - IS THAT THE GUY FROM BEDWA-  sevgranddad on Discord
 <br/>
 [rce-incorporated](https://github.com/rce-incorporated/Fiu) - Luau bytecode disassembly with modifications
 <br/>
 [Egor Skriptunoff, boatbomber, and howmanysmall](https://devforum.roblox.com/t/open-source-hashlib/416732/1) - HashLibrary for Luau
 <br/>
 [Vernumerator](https://devforum.roblox.com/t/predict-projectile-ballistics-including-gravity-and-motion/1842434) - Projectile prediction for Roblox
+[Night5449791](https://github.com/Night5449791) - skidding off the stuffs and add a bunch of shits
