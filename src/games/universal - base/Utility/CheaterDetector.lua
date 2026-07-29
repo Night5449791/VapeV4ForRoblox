@@ -7,7 +7,7 @@ local Users
 
 local cUsernames = {
 	["LaylaPowerGalaxy"] = 'known exploiter',
-	['WyRaff'] = 'speed',
+	['WyRaff'] = 'speedhack,teleporting',
 	['Bonjour394'] = 'skid'
 }
 
