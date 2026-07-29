@@ -6,7 +6,7 @@ local Profile
 local Users
 
 local cUsernames = {
-	["LaylaPowerGalaxy"] = 'known exp',
+	["LaylaPowerGalaxy"] = 'known exploiter',
 	['WyRaff'] = 'speed',
 	['Bonjour394'] = 'skid'
 }
