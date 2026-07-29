@@ -32,7 +32,7 @@ CheatDetector = vape.Categories.Utility:CreateModule({
 			CheatDetector:Clean(vapeEvents.CheatFlagged.Event:Connect(function(plr, flagname)
 				notif('CheatDetector', 'This player may be cheating! ('..flagname..'): '..plr.Name, 60, 'warning')
 				if SendWebook.Enabled then
-					webhook.sendwebhook(Webhookurl.Value, 'womp womp bums cheat get dtc lmfao', plr.Name:flagname') )
+					webhook.sendwebhook(Webhookurl.Value, 'womp womp bums cheat get dtc lmfao', plr.Name:flagname )
 				end
 
 				if AddTarget.Enabled then
