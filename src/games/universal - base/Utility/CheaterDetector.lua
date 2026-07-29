@@ -1,3 +1,5 @@
+-- i vibecoded this enjoy
+
 local CheaterDetector
 local Mode
 local Profile
@@ -15,9 +17,6 @@ local cUsernames = {
 }
 
 local function playerAdded(plr)
-	if not vape.Loaded then
-		repeat task.wait() until vape.Loaded
-	end
 	
 	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) and 'blacklisted_user'
 		or cIds[plr.UserId] and 'cheater_userid'
