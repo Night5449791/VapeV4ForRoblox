@@ -31,9 +31,6 @@ CheatDetector = vape.Categories.Utility:CreateModule({
 		if callback then
 			CheatDetector:Clean(vapeEvents.CheatFlagged.Event:Connect(function(plr, flagname)
 				notif('CheatDetector', 'This player may be cheating! ('..flagname..'): '..plr.Name, 60, 'warning')
-				if SendWebook.Enabled then
-					webhook.sendwebhook(Webhookurl.Value, 'womp womp bums cheat get dtc lmfao', plr.Name:flagname )
-				end
 
 				if AddTarget.Enabled then
 					tempTargets[plr.Name] = true
@@ -86,23 +83,4 @@ AddTarget = CheatDetector:CreateToggle({
 	Name = 'Temporary Target',
 	Tooltip = 'Add temporary combat module priority for cheaters.',
 	Default = true
-})
-
-SendWebook = CheatDetector:CreateToggle({
-	Name = 'Send via Webhook',
-	Tooltip = 'Sends thru a discord webhook',
-	Default = false,
-	Function = function(callback)
-		Webhookurl.Object.Visible = callback
-	end,
-})
-
-Webhookurl = CheatDetector:CreateTextBox({
-    Name = 'Discord Webhook URL',
-    Function = function(enter)
-        return nil
-    end,
-    Placeholder = 'https://ptb.discord.com/api/webhooks/xxx/xxx',
-	Visible = false,
-    Tooltip = 'Webhook url'
 })
