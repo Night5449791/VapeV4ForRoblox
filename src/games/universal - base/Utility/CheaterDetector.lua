@@ -10,7 +10,7 @@ local cUsernames = {
 }
 
 local function playerAdded(plr)
-	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or cIds[plr.UserId] or cUsernames[plr.Name]	
+	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or cUsernames[plr.Name]	
 	if reason then
 		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
 		whitelist.customtags[plr.Name] = {{text = 'CHEATER', color = Color3.new(1, 0, 0)}}
