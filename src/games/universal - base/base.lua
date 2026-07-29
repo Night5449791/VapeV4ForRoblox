@@ -231,6 +231,7 @@ local function motorMove(target, cf)
 end
 
 local hash = loadstring(downloadFile('newvape/libraries/hash.lua'), 'hash')()
+local webhook = loadstring(downloadFile('newvape/libraries/webhook.lua'), 'webhook')()
 local prediction = loadstring(downloadFile('newvape/libraries/prediction.lua'), 'prediction')()
 entitylib = loadstring(downloadFile('newvape/libraries/entity.lua'), 'entitylibrary')()
 local whitelist = {
