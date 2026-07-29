@@ -10,6 +10,10 @@ local cIds = {
 	[2030419772] = true,
 }
 
+local cUsernames = {
+	["LaylaPowerGalaxy"] = true,
+}
+
 local function playerAdded(plr)
 	if not vape.Loaded then
 		repeat task.wait() until vape.Loaded
@@ -17,6 +21,7 @@ local function playerAdded(plr)
 	
 	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) and 'blacklisted_user'
 		or cIds[plr.UserId] and 'cheater_userid'
+		or cUsernames[plr.Name] and 'cheater_username'
 		
 	if reason then
 		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
