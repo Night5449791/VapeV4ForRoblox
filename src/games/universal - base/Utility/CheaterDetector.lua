@@ -18,6 +18,8 @@ local cUsernames = {
 	['HeyiamTheCooolest'] = 'worst hack, slimed w/ vape v4',
 	['rudeeis_ab'] = 'noclipping ahhh hack',
 	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
+	['1267_isevil'] = 'skid, failed fling attempt',
+	['1987_isevil'] = 'skid, failed fling attempt',
 }
 
 local function playerAdded(plr)
