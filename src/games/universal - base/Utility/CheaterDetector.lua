@@ -15,6 +15,8 @@ local cUsernames = {
 	['jerry_plsnoban7'] = 'skid,fling and got kicked',
 	['jerry_plsnoban6'] = 'skid alt acc,fling and got kicked',
 	['jerry_plsnoban5'] = 'skid alt acc,fling and got kicked',
+	['PrisonLife_UberDrive'] = 'uber, vfly user',
+	['HeyiamTheCooolest'] = 'worst hack, slimed w/ vape v4',
 }
 
 local function playerAdded(plr)
