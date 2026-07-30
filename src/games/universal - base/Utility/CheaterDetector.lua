@@ -12,11 +12,12 @@ local cUsernames = {
 	['princeofegypt'] = 'skid, gets kicked for fling attempt', -- imagine gets kicked for script that kicks
 	['Chill_baconr00'] = 'skid, highjump', -- skid using vape v4 from 7granddadpgn and cant beat me XD
 	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
-	['jerry_plsnoban7'] = 'skid,fling and got kicked',
+	['jerry_plsnoban7'] = 'skid,fling and got kicked', -- cringe
 	['jerry_plsnoban6'] = 'skid alt acc,fling and got kicked',
 	['jerry_plsnoban5'] = 'skid alt acc,fling and got kicked',
-	['PrisonLife_UberDrive'] = 'uber, vfly user',
+	['PrisonLife_UberDrive'] = 'uber, vfly user', -- hes chilling added for vfly
 	['HeyiamTheCooolest'] = 'worst hack, slimed w/ vape v4',
+	['rudeeis_ab'] = 'noclipping ahhh hack',
 }
 
 local function playerAdded(plr)
