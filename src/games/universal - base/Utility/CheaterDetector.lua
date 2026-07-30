@@ -8,12 +8,13 @@ local Users
 local cUsernames = {
 	["LaylaPowerGalaxy"] = 'known exploiter',
 	['WyRaff'] = 'speedhack,teleporting',
-	['Bonjour394'] = 'skid tho hes powerful',
+	['Bonjour394'] = 'skid thinks hes powerful',
 	['princeofegypt'] = 'skid, gets kicked for fling attempt',
 	['Chill_baconr00'] = 'skid, highjump',
 	['PraiseDracc'] = 'known exploiter',
 	['jerry_plsnoban7'] = 'skid,fling and got kicked',
-	['jerry_plsnoban6'] = 'skid,fling and got kicked',
+	['jerry_plsnoban6'] = 'skid alt acc,fling and got kicked',
+	['jerry_plsnoban5'] = 'skid alt acc,fling and got kicked',
 }
 
 local function playerAdded(plr)
