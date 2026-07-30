@@ -20,6 +20,7 @@ local cUsernames = {
 	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
 	['1267_isevil'] = 'skid, failed fling attempt',
 	['1987_isevil'] = 'skid, failed fling attempt',
+	['JOJI12416'] = 'known exploiter', -- kerax if u wonder 
 }
 
 local function playerAdded(plr)
