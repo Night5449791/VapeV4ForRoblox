@@ -9,7 +9,8 @@ local cUsernames = {
 	["LaylaPowerGalaxy"] = 'known exploiter',
 	['WyRaff'] = 'speedhack,teleporting',
 	['Bonjour394'] = 'skid tho hes powerful',
-	['princeofegypt'] = 'skid, gets kicked for fling attempt'
+	['princeofegypt'] = 'skid, gets kicked for fling attempt',
+	['Chill_baconr00'] = 'skid, highjump'
 }
 
 local function playerAdded(plr)
