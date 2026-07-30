@@ -6,11 +6,11 @@ local Profile
 local Users
 
 local cUsernames = {
-	["LaylaPowerGalaxy"] = 'known exploiter',
-	['WyRaff'] = 'speedhack,teleporting',
-	['Bonjour394'] = 'skid thinks hes powerful',
-	['princeofegypt'] = 'skid, gets kicked for fling attempt',
-	['Chill_baconr00'] = 'skid, highjump',
+	["LaylaPowerGalaxy"] = 'known exploiter', -- @night5449791
+	['WyRaff'] = 'speedhack,teleporting', -- vc server common
+	['Bonjour394'] = 'skid thinks hes powerful', -- hes js a jerk
+	['princeofegypt'] = 'skid, gets kicked for fling attempt', -- imagine gets kicked for script that kicks
+	['Chill_baconr00'] = 'skid, highjump', -- skid using vape v4 from 7granddadpgn and cant beat me XD
 	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
 	['jerry_plsnoban7'] = 'skid,fling and got kicked',
 	['jerry_plsnoban6'] = 'skid alt acc,fling and got kicked',
