@@ -18,6 +18,7 @@ local cUsernames = {
 	['PrisonLife_UberDrive'] = 'uber, vfly user', -- hes chilling added for vfly
 	['HeyiamTheCooolest'] = 'worst hack, slimed w/ vape v4',
 	['rudeeis_ab'] = 'noclipping ahhh hack',
+	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
 }
 
 local function playerAdded(plr)
