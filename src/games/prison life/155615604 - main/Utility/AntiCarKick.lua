@@ -4,8 +4,8 @@ AntiCarKick = vape.Categories.Utility:CreateModule({
 	Name = 'AntiCarKick',
 	Function = function(callback)
 		if callback then
-			if game.CarContainer then
-                game.CarContainer:Destroy()
+			if game.CarContainers then
+                game.CarContainers:Destroy()
             else
                 return nil
             end
