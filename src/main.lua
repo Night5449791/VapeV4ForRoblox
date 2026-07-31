@@ -54,8 +54,18 @@ local function finishLoading()
 			local teleportScript = [[
 				shared.vapereload = true
 				if shared.VapeDeveloper then
+					delfile("newvape/main.lua")
+					delfolder('newvape/libraries')
+					delfolder('newvape/games')
+					delfolder('newvape/assets')
+					delfolder('newvape/guis')
 					loadstring(readfile('newvape/loader.lua'), 'loader')()
 				else
+					delfile("newvape/main.lua")
+					delfolder('newvape/libraries')
+					delfolder('newvape/games')
+					delfolder('newvape/assets')
+					delfolder('newvape/guis')
 					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true), 'loader')()
 				end
 			]]
