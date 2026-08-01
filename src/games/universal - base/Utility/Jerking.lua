@@ -1,4 +1,6 @@
 local Jerking
+local anim
+local track
 
 Jerking = vape.Categories.Utility:CreateModule({
 	Name = "Jerking",
