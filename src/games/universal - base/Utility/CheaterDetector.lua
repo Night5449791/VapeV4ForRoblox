@@ -21,7 +21,8 @@ local cUsernames = {
 	['1267_isevil'] = 'skid, failed fling attempt',
 	['1987_isevil'] = 'skid, failed fling attempt',
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
-	['jbskjbg'] = 'platform stand exp'
+	['jbskjbg'] = 'platform stand exp',
+	['BestCode_BaconThx'] = 'fling attempt, worst communist>',
 }
 
 local function playerAdded(plr)
