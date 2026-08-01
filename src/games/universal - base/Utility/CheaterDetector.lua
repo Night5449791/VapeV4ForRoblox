@@ -1,4 +1,5 @@
 -- i vibecoded this enjoy
+-- we all code for shits lol
 
 local CheaterDetector
 local Mode
