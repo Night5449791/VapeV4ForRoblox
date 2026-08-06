@@ -15,16 +15,12 @@ local Overlay = OverlapParams.new()
 Overlay.FilterType = Enum.RaycastFilterType.Include
 local Particles, Boxes, AttackDelay = {}, {}, tick()
 
--- 已删除 getAttackData 函数，不再需要
-
 Killaura = vape.Categories.Blatant:CreateModule({
 	Name = 'Killaura',
 	Function = function(callback)
 		if callback then
 			repeat
 				local attacked = {}
-
-				-- 移除了 canAttack 判断，攻击逻辑始终执行
 				local plrs = entitylib.AllPosition({
 					Range = AttackRange.Value,
 					Wallcheck = Targets.Walls.Enabled or nil,
