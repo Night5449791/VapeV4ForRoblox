@@ -15,51 +15,44 @@ local Overlay = OverlapParams.new()
 Overlay.FilterType = Enum.RaycastFilterType.Include
 local Particles, Boxes, AttackDelay = {}, {}, tick()
 
-local function getAttackData()
-	if Mouse.Enabled then
-		if not inputService:IsMouseButtonPressed(0) then return false end
-	end
-
-	return true
-end
+-- 已删除 getAttackData 函数，不再需要
 
 Killaura = vape.Categories.Blatant:CreateModule({
 	Name = 'Killaura',
 	Function = function(callback)
 		if callback then
 			repeat
-				local canAttack = getAttackData()
 				local attacked = {}
-				if canAttack then
-					local plrs = entitylib.AllPosition({
-						Range = AttackRange.Value,
-						Wallcheck = Targets.Walls.Enabled or nil,
-						Part = 'RootPart',
-						Players = Targets.Players.Enabled,
-						NPCs = Targets.NPCs.Enabled,
-						Limit = Max.Value,
-						AttackCheck = true
-					})
 
-					if #plrs > 0 then
-						local selfpos = entitylib.character.RootPart.Position
-						local localfacing = entitylib.character.RootPart.CFrame.LookVector * Vector3.new(1, 0, 1)
+				-- 移除了 canAttack 判断，攻击逻辑始终执行
+				local plrs = entitylib.AllPosition({
+					Range = AttackRange.Value,
+					Wallcheck = Targets.Walls.Enabled or nil,
+					Part = 'RootPart',
+					Players = Targets.Players.Enabled,
+					NPCs = Targets.NPCs.Enabled,
+					Limit = Max.Value,
+					AttackCheck = true
+				})
 
-						for _, v in plrs do
-							local delta = (v.RootPart.Position - selfpos)
-							local angle = math.acos(localfacing:Dot((delta * Vector3.new(1, 0, 1)).Unit))
-							if angle > (math.rad(AngleSlider.Value) / 2) then continue end
-							if lplr.Team == teams.Guards and v.Player.Team == teams.Inmates and not v.Character:GetAttribute('Hostile') then
-								continue
-							end
+				if #plrs > 0 then
+					local selfpos = entitylib.character.RootPart.Position
+					local localfacing = entitylib.character.RootPart.CFrame.LookVector * Vector3.new(1, 0, 1)
 
-							table.insert(attacked, {
-								Entity = v,
-								Check = BoxAttackColor
-							})
-							targetinfo.Targets[v] = tick() + 1
-							replicatedStorage.meleeEvent:FireServer(v.Player, 1, 1)
+					for _, v in plrs do
+						local delta = (v.RootPart.Position - selfpos)
+						local angle = math.acos(localfacing:Dot((delta * Vector3.new(1, 0, 1)).Unit))
+						if angle > (math.rad(AngleSlider.Value) / 2) then continue end
+						if lplr.Team == teams.Guards and v.Player.Team == teams.Inmates and not v.Character:GetAttribute('Hostile') then
+							continue
 						end
+
+						table.insert(attacked, {
+							Entity = v,
+							Check = BoxAttackColor
+						})
+						targetinfo.Targets[v] = tick() + 1
+						replicatedStorage.meleeEvent:FireServer(v.Player, 1, 1)
 					end
 				end
 
