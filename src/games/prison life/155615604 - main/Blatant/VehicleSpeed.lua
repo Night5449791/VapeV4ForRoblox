@@ -7,6 +7,7 @@ VehicleSpeed = vape.Categories.Blatant:CreateModule({
 	Name = 'VehicleSpeed',
 	Function = function(callback)
 		if callback then
+			speed.Enabled = false
 			repeat
 				local seat = entitylib.isAlive and entitylib.character.Humanoid.SeatPart
 				if seat then
@@ -28,9 +29,10 @@ VehicleSpeed = vape.Categories.Blatant:CreateModule({
 			until not VehicleSpeed.Enabled
 		else
 			table.clear(seats)
+			Speed.Enabled = true
 		end
 	end,
-	Tooltip = 'Increase vehicle speed'
+	Tooltip = 'Increase vehicle (Will disable speed)'
 })
 Speed = VehicleSpeed:CreateSlider({
 	Name = 'Speed',
