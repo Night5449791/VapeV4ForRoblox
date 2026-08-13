@@ -10,7 +10,7 @@ AutoReset = vape.Categories.Utility:CreateModule({
 				local team = lplr.Team
 				reqteam:InvokeServer(
 					game:GetService("Teams"):FindFirstChild(team),
-					1
+					1 
 				)
 			end))
 		end
