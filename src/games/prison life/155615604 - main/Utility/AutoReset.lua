@@ -9,7 +9,7 @@ AutoReset = vape.Categories.Utility:CreateModule({
 			AutoReset:Clean(vapeEvents.PlayerKill.Event:Connect(function()
 				local team = lplr.Team
 				reqteam:InvokeServer(
-					game:GetService("Teams"):FindFirstChild(team),
+					game:GetService("Teams"):FindFirstChild(.. team ..),
 					1
 				)
 			end))
