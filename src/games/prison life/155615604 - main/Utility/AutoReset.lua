@@ -1,9 +1,9 @@
-local AutoReset
+local ACReset
 local reqteam = game:GetService("ReplicatedStorage"):FindFirstChild("Remotes"):FindFirstChild("RequestTeamChange")
 local conns = {}
 
-AutoReset = vape.Categories.Utility:CreateModule({
-	Name = 'AutoReset',
+ACReset = vape.Categories.Utility:CreateModule({
+	Name = 'ACReset',
 	Function = function(callback)
 		if callback then
 			local t = lplr.Team and game:GetService("Teams"):FindFirstChild(lplr.Team.Name)
