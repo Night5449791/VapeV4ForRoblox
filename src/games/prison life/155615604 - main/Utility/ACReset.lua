@@ -16,4 +16,4 @@ ACReset = vape.Categories.Utility:CreateModule({
 		end
 	end,
 	Tooltip = 'Automatically switch team when lplr is dead.'
-})
+}) 
