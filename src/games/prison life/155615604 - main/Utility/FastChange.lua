@@ -15,6 +15,7 @@ FastChange = vape.Categories.Utility:CreateModule({
                 wait(2)
                 reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Inmates"), 1)
             end
+            FastChange:Toggle()
         end
     end,
     Tooltip = 'Automatically switch team when lplr is dead.'
