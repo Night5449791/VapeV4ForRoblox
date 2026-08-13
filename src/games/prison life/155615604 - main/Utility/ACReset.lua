@@ -5,14 +5,14 @@ ACReset = vape.Categories.Utility:CreateModule({
     Name = 'ACReset',
     Function = function(callback)
         if callback then
-            repeat
+            entitylib.isAlive:Connect(function()
                 if not entitylib.isAlive then
                     local team = game:GetService("Players").LocalPlayer.Team
                     reqteam:InvokeServer("Neutral")
                     wait(.5)
                     reqteam:InvokeServer(team)
                 end
-            until not callback
+            end)
         end
     end,
     Tooltip = 'Automatically switch team when lplr is dead.'
