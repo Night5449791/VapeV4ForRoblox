@@ -5,7 +5,7 @@ ACReset = vape.Categories.Utility:CreateModule({
     Name = 'ACReset',
     Function = function(callback)
         if callback then
-            entitylib.isAlive:Connect(function()
+            entitylib:Connect(function()
                 if not entitylib.isAlive then
                     local team = game:GetService("Players").LocalPlayer.Team
                     reqteam:InvokeServer("Neutral")
