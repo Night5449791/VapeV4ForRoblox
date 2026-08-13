@@ -10,14 +10,14 @@ FastChange = vape.Categories.Utility:CreateModule({
                 reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Neutral"), 1)
                 wait(1)
                 reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Guards"), 1)
-                if lplr.Team == game:GetService("Teams"):FindFirstChild("Neutral") then
+                if lplr.Team == 'Neutral' then
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Inmates"), 1)
                 end
             elseif ChooseTeam.Value == 'Inmates' then
                 reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Neutral"), 1)
                 wait(1)
                 reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Inmates"), 1)
-                if lplr.Team == game:GetService("Teams"):FindFirstChild("Neutral") then
+                if lplr.Team == 'Neutral' then
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Guards"), 1)
                 end
             end
