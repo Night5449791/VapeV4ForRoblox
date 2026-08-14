@@ -23,7 +23,8 @@ local cUsernames = {
 	['1987_isevil'] = 'skid, failed fling attempt',
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
 	['jbskjbg'] = 'platform stand exp',
-	['BestCode_BaconThx'] = 'fling attempt, worst communist>',  -- skid lol
+	['BestCode_BaconThx'] = 'fling attempt',  -- ac mod in .gg/prisonlife
+	['RazhulanDeveloper'] = 'fling attempt, not a skid but he does that', -- respect, ac mod
 }
 
 local function playerAdded(plr)
