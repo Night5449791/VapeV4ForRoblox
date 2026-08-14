@@ -5,6 +5,7 @@ AntiCarFling = vape.Categories.Blatant:CreateModule({
 	Function = function(callback)
 		if callback then
 			game.Workspace.CarContainer:Destroy()
+            notif('AntiCarFling', 'Deleted all cars, rejoin to fucking see shits.', 5, 'alert')
             AntiCarFling:Toggle()
 		end
 	end,
