@@ -12,14 +12,3 @@ CopyJobid = vape.Categories.Utility:CreateModule({
 	end,
 	Tooltip = 'Copies jobid to clipboard'
 })
-
-userjobid = CopyJobid:CreateTextBox({
-    Name = 'Job Id to join (Same PlaceId)',
-    Function = function(enter)
-        serverHop(game.PlaceId, enter)
-		enter = nil
-    end,
-    Placeholder = 'insert jobid',
-    Tooltip = 'Joins jobid'
-})
-
