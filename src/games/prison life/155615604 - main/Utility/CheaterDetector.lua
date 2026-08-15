@@ -30,7 +30,8 @@ local cUsernames = {
 	['bilinmez4095'] = 'skid, platform stand fly',
 	['djdjdd54321'] = 'skid, noclipping into walls',
 	['cnmjm222'] = 'skid, invis',
-	['oyeuser67'] = 'skid, speedhack'
+	['oyeuser67'] = 'skid, speedhack',
+	['BetterCallMe788'] = 'skid, fling'
 }
 
 local function playerAdded(plr)
