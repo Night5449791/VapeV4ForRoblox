@@ -26,8 +26,9 @@ local cUsernames = {
 	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
 	['Bonjour394'] = 'skid thinks hes powerful', -- hes js a jerk
 	['princeofegypt'] = 'skid, gets kicked for fling attempt', -- imagine gets kicked for script that kicks
-	['bilinmez4095'] = 'skid, platform stand fly'
-	['djdjdd54321'] = 'skid, noclipping into walls'
+	['bilinmez4095'] = 'skid, platform stand fly',
+	['djdjdd54321'] = 'skid, noclipping into walls',
+	['laylapowergalaxy'] = 'test',
 }
 
 local function playerAdded(plr)
