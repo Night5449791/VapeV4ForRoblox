@@ -34,7 +34,8 @@ local cUsernames = {
 	['BetterCallMe788'] = 'fling',
 	['Avacad0731'] = 'noclipping',
 	['C0nquerons'] = 'Platform Stand exploit',
-	['goobyzoobytv'] = 'noclipping'
+	['goobyzoobytv'] = 'noclipping',
+	['Joni_8824'] = 'skid thought fling + noclip = op'
 }
 
 local function playerAdded(plr)
