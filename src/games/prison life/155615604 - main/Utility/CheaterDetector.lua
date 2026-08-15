@@ -14,25 +14,26 @@ local cUsernames = {
 	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
 	['BestCode_BaconThx'] = 'fling attempt, ac mod',  -- ac mod in .gg/prisonlife
-	['RazhulanDeveloper'] = 'fling attempt, not a skid but he does that', -- respect, ac mod
+	['RazhulanDeveloper'] = 'fling attempt, not a  but he does that', -- respect, ac mod
 	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
-	--skids
-	['jbskjbg'] = 'skid,platform stand exp',
-	['1267_isevil'] = 'skid, failed fling attempt',
-	['1987_isevil'] = 'skid, failed fling attempt',
-	['HeyiamTheCooolest'] = 'skid, slimed w/ vape v4',
-	['Chill_baconr00'] = 'skid, highjump', -- skid using vape v4 from 7granddadpgn and cant beat me XD
-	['PrisonLife_UberDrive'] = 'skid, vfly user', -- hes chilling added for vfly
-	['gcfhjfjf4'] = 'skid, highjump . aimbot',
+	-- skids list
+	['jbskjbg'] = 'platform stand exp',
+	['1267_isevil'] = 'failed fling attempt',
+	['1987_isevil'] = 'failed fling attempt',
+	['HeyiamTheCooolest'] = 'slimed w/ vape v4',
+	['Chill_baconr00'] = 'highjump', --  using vape v4 from 7granddadpgn and cant beat me XD
+	['PrisonLife_UberDrive'] = 'vfly user', -- hes chilling added for vfly
+	['gcfhjfjf4'] = 'highjump . aimbot',
 	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
 	['Bonjour394'] = 'skid thinks hes powerful', -- hes js a jerk
-	['princeofegypt'] = 'skid, gets kicked for fling attempt', -- imagine gets kicked for script that kicks
-	['bilinmez4095'] = 'skid, platform stand fly',
-	['djdjdd54321'] = 'skid, noclipping into walls',
-	['cnmjm222'] = 'skid, invis',
-	['oyeuser67'] = 'skid, speedhack',
-	['BetterCallMe788'] = 'skid, fling',
-	['Avacad0731'] = 'skid,noclipping',
+	['princeofegypt'] = 'gets kicked for fling attempt', -- imagine gets kicked for script that kicks
+	['bilinmez4095'] = 'platform stand fly',
+	['djdjdd54321'] = 'noclipping into walls',
+	['cnmjm222'] = 'invis',
+	['oyeuser67'] = 'speedhack',
+	['BetterCallMe788'] = 'fling',
+	['Avacad0731'] = 'noclipping',
+	['C0nquerons'] = 'Platform Stand exploit',
 }
 
 local function playerAdded(plr)
