@@ -15,6 +15,7 @@ local cUsernames = {
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
 	['BestCode_BaconThx'] = 'fling attempt, ac mod',  -- ac mod in .gg/prisonlife
 	['RazhulanDeveloper'] = 'fling attempt, not a skid but he does that', -- respect, ac mod
+	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
 	--skids
 	['jbskjbg'] = 'skid,platform stand exp',
 	['1267_isevil'] = 'skid, failed fling attempt',
