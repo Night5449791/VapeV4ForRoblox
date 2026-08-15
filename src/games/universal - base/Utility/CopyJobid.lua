@@ -16,7 +16,7 @@ CopyJobid = vape.Categories.Utility:CreateModule({
 userjobid = CopyJobid:CreateTextBox({
     Name = 'Job Id to join (Same PlaceId)',
     Function = function(enter)
-        teleportService:TeleportToPlaceInstance(game.PlaceId, enter)
+        serverhop(game.PlaceId, enter)
     end,
     Placeholder = 'insert jobid',
     Tooltip = 'Joins jobid'
