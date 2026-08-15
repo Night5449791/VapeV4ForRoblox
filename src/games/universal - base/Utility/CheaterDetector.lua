@@ -28,7 +28,7 @@ local cUsernames = {
 	['princeofegypt'] = 'skid, gets kicked for fling attempt', -- imagine gets kicked for script that kicks
 	['bilinmez4095'] = 'skid, platform stand fly',
 	['djdjdd54321'] = 'skid, noclipping into walls',
-	['laylapowergalaxy'] = 'test',
+	['LaylaPowerGalaxy'] = 'test',
 }
 
 local function playerAdded(plr)
