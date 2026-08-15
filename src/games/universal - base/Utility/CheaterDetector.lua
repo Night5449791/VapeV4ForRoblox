@@ -24,9 +24,10 @@ local cUsernames = {
 	['jbskjbg'] = 'platform stand exp',
 	['1267_isevil'] = 'skid, failed fling attempt',
 	['1987_isevil'] = 'skid, failed fling attempt',
-	['HeyiamTheCooolest'] = 'worst hack, slimed w/ vape v4',
+	['HeyiamTheCooolest'] = 'skid, slimed w/ vape v4',
 	['Chill_baconr00'] = 'skid, highjump', -- skid using vape v4 from 7granddadpgn and cant beat me XD
-	['PrisonLife_UberDrive'] = 'uber, vfly user', -- hes chilling added for vfly
+	['PrisonLife_UberDrive'] = 'skid, vfly user', -- hes chilling added for vfly
+	['gcfhjfjf4'] = 'skid, highjump . aimbot'
 }
 
 local function playerAdded(plr)
