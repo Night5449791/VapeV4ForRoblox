@@ -16,6 +16,7 @@ local cUsernames = {
 	['BestCode_BaconThx'] = 'fling attempt, ac mod',  -- ac mod in .gg/prisonlife
 	['RazhulanDeveloper'] = 'fling attempt, not a  but he does that', -- respect, ac mod
 	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
+	['DawnPulseVoid'] = 'known exploiter',
 	-- skids list
 	['jbskjbg'] = 'platform stand exp',
 	['1267_isevil'] = 'failed fling attempt',
