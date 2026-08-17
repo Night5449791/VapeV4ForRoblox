@@ -38,6 +38,7 @@ local cUsernames = {
 	['goobyzoobytv'] = 'noclipping',
 	['Joni_8824'] = 'skid thought fling + noclip = op',
 	['jaycomputing'] = 'skid using selenium larps and got kicked',
+	['tooodarl9'] = 'skid exploiter'
 }
 
 local function playerAdded(plr)
