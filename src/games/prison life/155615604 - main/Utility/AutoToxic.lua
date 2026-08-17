@@ -32,11 +32,7 @@ AutoToxic = vape.Categories.Utility:CreateModule({
 	Function = function(callback)
 		if callback then
 			AutoToxic:Clean(vapeEvents.CheaterKicked.Event:Connect(function(plr)
-				if plr == lplr.DisplayName then
-					sendMessage('Kicked', plr, '.kick <obj>')
-				else
-					sendMessage('Kicked', plr, 'kicked <obj> | skill issue ')
-				end
+				sendMessage('Kicked', plr, 'kicked <obj> | skill issue ')
 			end))
 		end
 	end,
