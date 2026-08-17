@@ -35,7 +35,7 @@ AutoToxic = vape.Categories.Utility:CreateModule({
 				if plr == lplr.DisplayName then
 					sendMessage('Kicked', plr, '.ackick <obj>')
 				else
-					sendMessage('Kicked', plr, 'skill issue | <obj>')
+					sendMessage('Kicked', plr, 'kicked <obj> | skill issue ')
 				end
 			end))
 		end
