@@ -7,7 +7,7 @@ FastChange = vape.Categories.Blatant:CreateModule({
     Function = function(callback)
         if callback then 
             if ChooseTeam.Value == 'Guards' then
-                if not lplr.Teams == "Neutral" then
+                if not lplr.Team == "Neutral" then
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Neutral"), 1)
                 end
                 wait(1)
@@ -17,7 +17,7 @@ FastChange = vape.Categories.Blatant:CreateModule({
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Guards"), 1) 
                 end
             elseif ChooseTeam.Value == 'Inmates' then
-                if not lplr.Teams == "Neutral" then
+                if not lplr.Team == "Neutral" then
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Neutral"), 1)
                 end
                 wait(1)
