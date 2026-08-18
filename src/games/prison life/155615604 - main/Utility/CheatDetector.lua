@@ -1,7 +1,5 @@
 local CheatDetector
 local AddTarget
-local SendWebook
-local Webhookurl
 local overlap = OverlapParams.new()
 overlap.CollisionGroup = 'Players'
 overlap.FilterDescendantsInstances = {workspace.CarContainer, workspace.Doors}
@@ -31,7 +29,6 @@ CheatDetector = vape.Categories.Utility:CreateModule({
 		if callback then
 			CheatDetector:Clean(vapeEvents.CheatFlagged.Event:Connect(function(plr, flagname)
 				notif('CheatDetector', 'This player may be cheating! ('..flagname..'): '..plr.Name, 60, 'warning')
-
 				if AddTarget.Enabled then
 					tempTargets[plr.Name] = true
 				end
