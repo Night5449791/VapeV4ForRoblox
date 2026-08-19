@@ -41,6 +41,7 @@ local cUsernames = {
 	['tooodarl9'] = 'skid exploiter',
 	['Henr45555455'] = 'platform stand fly',
 	['Marssimo_14'] = 'platform stand fly',
+	['boy_cantot2'] = 'platform stand exploit',
 }
 
 local function playerAdded(plr)
