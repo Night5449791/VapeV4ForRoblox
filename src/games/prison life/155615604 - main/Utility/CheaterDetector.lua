@@ -42,6 +42,7 @@ local cUsernames = {
 	['Henr45555455'] = 'platform stand fly',
 	['Marssimo_14'] = 'platform stand fly',
 	['boy_cantot2'] = 'platform stand exploit',
+	['killerdoy372bro'] = 'invalid animation',
 }
 
 local function playerAdded(plr)
