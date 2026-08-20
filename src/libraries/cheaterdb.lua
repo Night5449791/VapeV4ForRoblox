@@ -1,16 +1,46 @@
-local cUsernames = {
-	[sha.md5] = 64;
-	[sha.sha1] = 64;
-	[sha.sha224] = 64;
-	[sha.sha256] = 64;
-	[sha.sha512_224] = 128;
-	[sha.sha512_256] = 128;
-	[sha.sha384] = 128;
-	[sha.sha512] = 128;
-	[sha.sha3_224] = (1600 - 2 * 224) / 8;
-	[sha.sha3_256] = (1600 - 2 * 256) / 8;
-	[sha.sha3_384] = (1600 - 2 * 384) / 8;
-	[sha.sha3_512] = (1600 - 2 * 512) / 8;
+local cUsernames
+
+cUsernames = {
+	['WyRaff'] = 'speedhack,teleporting', -- vc server common
+	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
+	['jerry_plsnoban7'] = 'fling and got kicked', -- cringe
+	['jerry_plsnoban6'] = 'fling and got kicked',
+	['jerry_plsnoban5'] = 'fling and got kicked',
+	['rudeeis_ab'] = 'phase/noclip ahhh hack', -- saint member, dont they even use the same thing
+	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
+	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
+	['DawnPulseVoid'] = 'known exploiter',
+	['BestCode_BaconThx']= 'fling attempt, ac mod',   -- ac mod in .gg/prisonlife
+	['RazhulanDeveloper'] = 'fling attempt, not a  but he does that', -- respect, ac mod
+	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
+	-- skids list
+	['jbskjbg'] = 'invalid state Platform Stand exp',
+	['1267_isevil'] = 'failed fling attempt',
+	['1987_isevil'] = 'failed fling attempt',
+	['HeyiamTheCooolest'] = 'skid exploiter',
+	['Chill_baconr00'] = 'highjump', --  using vape v4 from 7granddadpgn and cant beat me XD
+	['gcfhjfjf4'] = 'highjump, aimbot',
+	['dannielll51'] = 'headsit exploit', -- inspired, vape antiheadsit soon.
+	['Bonjour394'] = 'skid exploiter', -- hes js a jerk
+	['princeofegypt'] = 'gets kicked for fling attempt', -- imagine gets kicked for script that kicks
+	['bilinmez4095'] = 'invalid state Platform Stand',
+	['djdjdd54321'] = 'phase/noclip into walls',
+	['cnmjm222'] = 'invisible',
+	['oyeuser67'] = 'speedhack',
+	['BetterCallMe788'] = 'fling',
+	['Avacad0731'] = 'phase/noclip',
+	['C0nquerons'] = 'Platform Stand exploit',
+	['goobyzoobytv'] = 'phase/noclip',
+	['Joni_8824'] = 'phase/noclip',
+	['jaycomputing'] = 'skid using selenium larps and got kicked',
+	['tooodarl9'] = 'skid exploiter',
+	['Henr45555455'] = 'invalid state Platform Stand',
+	['Marssimo_14'] = 'invalid state Platform Stand',
+	['boy_cantot2'] = 'invalid state Platform Stand',
+	['killerdoy372bro'] = 'invalid animation',
+	['X4AY67'] = 'skid exploiter',
+	['trervoTDJ'] = 'aimbotting',
+	['Pedro9Henrique2000'] = 'phase/noclip',
 }
 
 return cUsernames
