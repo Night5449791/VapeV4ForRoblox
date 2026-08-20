@@ -29,6 +29,9 @@ CheatDetector = vape.Categories.Utility:CreateModule({
 		if callback then
 			CheatDetector:Clean(vapeEvents.CheatFlagged.Event:Connect(function(plr, flagname)
 				notif('CheatDetector', 'This player may be cheating! ('..flagname..'): '..plr.Name, 60, 'warning')
+				if CopyUserBoard.Enabled then
+					setclipboard("[" .. plr.Name .. "] = "".. flagname .. """) 
+
 				if AddTarget.Enabled then
 					tempTargets[plr.Name] = true
 				end
@@ -80,4 +83,10 @@ AddTarget = CheatDetector:CreateToggle({
 	Name = 'Temporary Target',
 	Tooltip = 'Add temporary combat module priority for cheaters.',
 	Default = true
+})
+
+CopyUserBoard = CheatDetector:CreateToggle({
+	Name = 'Copy to clipboard',
+	Tooltip = 'copies cheaters into clipboard',
+	Default = false
 })
