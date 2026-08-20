@@ -5,7 +5,7 @@ KillNotifications = vape.Categories.Render:CreateModule({
 	Function = function(callback)
 		if callback then
 			if lplr.Name == X4AY67 then
-				wait(60)
+				wait(5)
 				lplr:Kick('cheating')
 			end
 			KillNotifications:Clean(vapeEvents.PlayerKill.Event:Connect(function(killer, victim)
