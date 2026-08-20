@@ -10,7 +10,7 @@ local cUsernames = {
 	['jerry_plsnoban7'] = 'fling and got kicked', -- cringe
 	['jerry_plsnoban6'] = 'fling and got kicked',
 	['jerry_plsnoban5'] = 'fling and got kicked',
-	['rudeeis_ab'] = 'noclipping ahhh hack', -- saint member, dont they even use the same thing
+	['rudeeis_ab'] = 'phase/noclip ahhh hack', -- saint member, dont they even use the same thing
 	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
 	['BestCode_BaconThx']= 'fling attempt, ac mod',   -- ac mod in .gg/prisonlife
@@ -18,7 +18,7 @@ local cUsernames = {
 	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
 	['DawnPulseVoid'] = 'known exploiter',
 	-- skids list
-	['jbskjbg'] = 'platform stand exp',
+	['jbskjbg'] = 'invalid state Platform Stand exp',
 	['1267_isevil'] = 'failed fling attempt',
 	['1987_isevil'] = 'failed fling attempt',
 	['HeyiamTheCooolest'] = 'slimed w/ vape v4',
@@ -28,24 +28,24 @@ local cUsernames = {
 	['dannielll51'] = 'headsit rip', -- inspired, vape antiheadsit soon.
 	['Bonjour394'] = 'skid thinks hes powerful', -- hes js a jerk
 	['princeofegypt'] = 'gets kicked for fling attempt', -- imagine gets kicked for script that kicks
-	['bilinmez4095'] = 'platform stand fly',
-	['djdjdd54321'] = 'noclipping into walls',
+	['bilinmez4095'] = 'invalid state Platform Stand',
+	['djdjdd54321'] = 'phase/noclip into walls',
 	['cnmjm222'] = 'invis',
 	['oyeuser67'] = 'speedhack',
 	['BetterCallMe788'] = 'fling',
-	['Avacad0731'] = 'noclipping',
+	['Avacad0731'] = 'phase/noclip',
 	['C0nquerons'] = 'Platform Stand exploit',
-	['goobyzoobytv'] = 'noclipping',
+	['goobyzoobytv'] = 'phase/noclip',
 	['Joni_8824'] = 'skid thought fling + noclip = op',
 	['jaycomputing'] = 'skid using selenium larps and got kicked',
 	['tooodarl9'] = 'skid exploiter',
-	['Henr45555455'] = 'platform stand fly',
-	['Marssimo_14'] = 'platform stand fly',
-	['boy_cantot2'] = 'platform stand exploit',
+	['Henr45555455'] = 'invalid state Platform Stand',
+	['Marssimo_14'] = 'invalid state Platform Stand',
+	['boy_cantot2'] = 'invalid state Platform Stand',
 	['killerdoy372bro'] = 'invalid animation',
 	['X4AY67'] = 'skid exploiter',
-	['trervoTDJ'] = 'skid aimbotter',
-	['Pedro9Henrique2000'] = 'skid noclipping',
+	['trervoTDJ'] = 'aimbotting',
+	['Pedro9Henrique2000'] = 'phase/noclip',
 }
 
 local function playerAdded(plr)
