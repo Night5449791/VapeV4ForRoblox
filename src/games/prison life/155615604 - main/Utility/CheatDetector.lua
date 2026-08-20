@@ -30,7 +30,7 @@ CheatDetector = vape.Categories.Utility:CreateModule({
 			CheatDetector:Clean(vapeEvents.CheatFlagged.Event:Connect(function(plr, flagname)
 				notif('CheatDetector', 'This player may be cheating! ('..flagname..'): '..plr.Name, 60, 'warning')
 				if CopyUserBoard.Enabled then
-					setclipboard('[' .. plr.Name .. '] = "' .. flagname .. '"')
+					setclipboard('["' .. plr.Name .. '"] = "' .. flagname .. '"')
 				end
 
 				if AddTarget.Enabled then
