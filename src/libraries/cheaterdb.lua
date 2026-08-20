@@ -1,10 +1,6 @@
--- we all code for shits lol
-
-local CheaterDetector
 local cUsernames
-local Users
 
-local cUsernames = {
+cUsernames = {
 	['WyRaff'] = 'speedhack,teleporting', -- vc server common
 	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
 	['jerry_plsnoban7'] = 'fling and got kicked', -- cringe
@@ -45,28 +41,4 @@ local cUsernames = {
 	['X4AY67'] = 'skid exploiter',
 	['trervoTDJ'] = 'aimbotting',
 	['Pedro9Henrique2000'] = 'phase/noclip',
-	["faizan1111789"] = "speed",
-	['juanpro231ew'] = "invalid state Swimming",
 }
-
-local function playerAdded(plr)
-	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or cUsernames[plr.Name]	
-	if reason then
-		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
-		whitelist.customtags[plr.Name] = {{text = 'CHEATER', color = Color3.new(1, 0, 0)}}
-		tempTargets[plr.Name] = true
-	end
-end
-
-CheaterDetector = vape.Categories.Utility:CreateModule({
-	Name = 'CheaterDetector',
-	Function = function(callback)
-		if callback then
-			CheaterDetector:Clean(playersService.PlayerAdded:Connect(playerAdded))
-			for _, v in playersService:GetPlayers() do
-				task.spawn(playerAdded, v)
-			end
-		end
-	end,
-	Tooltip = 'Detects people with history of cheating',
-})

@@ -37,7 +37,8 @@ Killaura = vape.Categories.Blatant:CreateModule({
 						Part = 'RootPart',
 						Players = Targets.Players.Enabled,
 						NPCs = Targets.NPCs.Enabled,
-						Limit = Max.Value
+						Limit = Max.Value,
+						AttackCheck = true
 					})
 
 					if #plrs > 0 then
