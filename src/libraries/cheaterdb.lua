@@ -42,5 +42,3 @@ cUsernames = {
 	['trervoTDJ'] = 'aimbotting',
 	['Pedro9Henrique2000'] = 'phase/noclip',
 }
-
-return cUsernames
