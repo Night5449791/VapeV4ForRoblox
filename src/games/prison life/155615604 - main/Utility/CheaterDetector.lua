@@ -1,11 +1,11 @@
 -- we all code for shits lol
 
 local CheaterDetector
-local cUsernames == vape.
+local cUsernames == vape.Libraries.cheaterdb
 local Users
 
 local function playerAdded(plr)
-	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or vape.Libraries.cheaterdb[plr.Name]	
+	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or cUsernames[plr.Name]	
 	if reason then
 		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
 		whitelist.customtags[plr.Name] = {{text = 'CHEATER', color = Color3.new(1, 0, 0)}}
