@@ -686,9 +686,6 @@ do
 	end
 end
 
-cheaterdb = loadstring(downloadFile('newvape/libraries/cheaterdb.lua'), 'cheaterdb')
-vape.Libraries.cheaterdb = cheaterdb
-
 for _, v in {'Reach', 'Jesus', 'MurderMystery'} do
 	vape:Remove(v)
 end
