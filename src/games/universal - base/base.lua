@@ -231,7 +231,6 @@ end
 
 local hash = loadstring(downloadFile('newvape/libraries/hash.lua'), 'hash')()
 local prediction = loadstring(downloadFile('newvape/libraries/prediction.lua'), 'prediction')()
-cheaterdb = loadstring(downloadFile('newvape/libraries/cheaterdb.lua'), 'cheaterdb')
 entitylib = loadstring(downloadFile('newvape/libraries/entity.lua'), 'entitylibrary')()
 local whitelist = {
 	alreadychecked = {},
@@ -249,7 +248,6 @@ local whitelist = {
 	said = {}
 }
 vape.Libraries.entity = entitylib
-vape.Libraries.cheaterdb = cheaterdb
 vape.Libraries.whitelist = whitelist
 vape.Libraries.prediction = prediction
 vape.Libraries.hash = hash
