@@ -59,6 +59,7 @@ local cUsernames = {
 	["Unicornpoop1239508"] = "speed",
 	["kind_jack001"] = "invalid animation (invis)",
 	["lilyazz0000"] = "invalid state PlatformStanding (fly)",
+	["nobby_rules2"] = "speed",
 }
 
 local function playerAdded(plr)
