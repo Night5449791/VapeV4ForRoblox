@@ -58,6 +58,7 @@ local cUsernames = {
 	["Thacosmick_2"] = "invalid state Swimming",
 	["Unicornpoop1239508"] = "speed",
 	["kind_jack001"] = "invalid animation (invis)",
+	["lilyazz0000"] = "invalid state PlatformStanding (fly)",
 }
 
 local function playerAdded(plr)
