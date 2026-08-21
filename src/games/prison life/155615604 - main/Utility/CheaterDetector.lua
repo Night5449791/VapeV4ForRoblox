@@ -50,6 +50,7 @@ local cUsernames = {
 	["mchser3"] = "invalid state Swimming",
 	["rackasauras"] = "speed",
 	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
+	["ang5454"] = "highjump",
 }
 
 local function playerAdded(plr)
