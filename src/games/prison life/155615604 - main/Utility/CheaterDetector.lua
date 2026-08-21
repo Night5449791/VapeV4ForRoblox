@@ -11,11 +11,10 @@ local cUsernames = {
 	['jerry_plsnoban6'] = 'fling attempts',
 	['jerry_plsnoban5'] = 'fling attempts',
 	['rudeeis_ab'] = 'phase/noclip ahhh hack', -- saint member, dont they even use the same thing
-	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
 	['DawnPulseVoid'] = 'known exploiter',
-	['BestCode_BaconThx']= 'fling attempt, ac mod',   -- ac mod in .gg/prisonlife
-	['RazhulanDeveloper'] = 'fling attempt, not a  but he does that', -- respect, ac mod
+	['BestCode_BaconThx']= 'known exploiter',   -- ac mod in .gg/prisonlife
+	['RazhulanDeveloper'] = 'known exploiter', -- respect, ac mod
 	['SaintSkirr'] = 'fling attempt', -- not a big deal, why kerax just why
 	-- skids list
 	['jbskjbg'] = 'invalid state Platform Stand exp',
@@ -50,6 +49,7 @@ local cUsernames = {
 	["voidwalker5346"] = "invalid animation (car kick)",
 	["mchser3"] = "invalid state Swimming",
 	["rackasauras"] = "speed",
+	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 }
 
 local function playerAdded(plr)
