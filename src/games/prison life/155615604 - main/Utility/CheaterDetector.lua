@@ -52,6 +52,8 @@ local cUsernames = {
 	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 	["ang5454"] = "highjump",
 	['rackasauras'] = 'speed',
+	["dobys149"] = "phase/noclip",
+	["SyntaxK3v"] = "speed",
 }
 
 local function playerAdded(plr)
