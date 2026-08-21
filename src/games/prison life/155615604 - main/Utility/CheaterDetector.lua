@@ -54,6 +54,7 @@ local cUsernames = {
 	['rackasauras'] = 'speed',
 	["dobys149"] = "phase/noclip",
 	["SyntaxK3v"] = "speed",
+	["veggeta38372737"] = "kerax user",
 }
 
 local function playerAdded(plr)
