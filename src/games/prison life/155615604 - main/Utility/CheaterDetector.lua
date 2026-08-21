@@ -41,7 +41,6 @@ local cUsernames = {
 	['Marssimo_14'] = 'invalid state Platform Stand',
 	['boy_cantot2'] = 'invalid state Platform Stand',
 	['killerdoy372bro'] = 'invalid animation',
-	['X4AY67'] = 'skid exploiter',
 	['trervoTDJ'] = 'aimbotting',
 	['Pedro9Henrique2000'] = 'phase/noclip',
 	["faizan1111789"] = "speed",
