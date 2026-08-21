@@ -7,9 +7,9 @@ local Users
 local cUsernames = {
 	['WyRaff'] = 'speedhack,teleporting', -- vc server common
 	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
-	['jerry_plsnoban7'] = 'fling and got kicked', -- cringe
-	['jerry_plsnoban6'] = 'fling and got kicked',
-	['jerry_plsnoban5'] = 'fling and got kicked',
+	['jerry_plsnoban7'] = 'fling attempts', -- cringe
+	['jerry_plsnoban6'] = 'fling attempts',
+	['jerry_plsnoban5'] = 'fling attempts',
 	['rudeeis_ab'] = 'phase/noclip ahhh hack', -- saint member, dont they even use the same thing
 	['centipedeinmyheads'] = 'aimbot, wallbanging', -- another saint member lol
 	['JOJI12416'] = 'known exploiter', -- kerax if u wonder
