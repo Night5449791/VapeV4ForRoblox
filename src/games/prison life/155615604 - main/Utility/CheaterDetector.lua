@@ -55,6 +55,7 @@ local cUsernames = {
 	["dobys149"] = "phase/noclip",
 	["SyntaxK3v"] = "speed",
 	["veggeta38372737"] = "kerax user",
+	["Thacosmick_2"] = "invalid state Swimming",
 }
 
 local function playerAdded(plr)
