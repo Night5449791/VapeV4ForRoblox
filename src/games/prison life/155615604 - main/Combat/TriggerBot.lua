@@ -6,6 +6,7 @@ rayParams.FilterType = Enum.RaycastFilterType.Exclude
 
 local function getTriggerBotTarget()
 	rayParams.FilterDescendantsInstances = {lplr.Character}
+
 	if entitylib.isAlive then
 		local tool = debug.getupvalue(oldshoot or pl.Shoot, 1)
 		local data = debug.getupvalue(oldshoot or pl.Shoot, 10)
@@ -36,6 +37,7 @@ local function getTriggerBotTarget()
 			if vEntity then
 				local origin = entitylib.character.Head.Position
 				local hitCheck = workspace:Raycast(origin, (ray.Position - origin), rayCheck)
+
 				if hitCheck and hitCheck.Instance:IsDescendantOf(vEntity.Character) and (ray.Position - origin).Magnitude <= data.Range then
 					return vEntity
 				end

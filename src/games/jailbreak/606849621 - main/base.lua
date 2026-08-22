@@ -47,29 +47,22 @@ local vm = loadstring(downloadFile('newvape/libraries/vm.lua'), 'vm')()
 local jb = {}
 local InfNitro = {Enabled = false}
 local LazerGodmode = {Enabled = false}
+local InvTracker = {Inventories = {}, Connections = {}}
+local oldBulletUpdate
 
-local function getVehicle(ent)
-	if ent.Player then
+local function getVehicle(entity)
+	if entity.Player then
 		for _, car in collectionService:GetTagged('Vehicle') do
 			for _, seat in car:GetChildren() do
 				if (seat.Name == 'Seat' or seat.Name == 'Passenger') then
 					seat = seat:FindFirstChild('PlayerName')
-					if seat and seat.Value == ent.Player.Name then
+					if seat and seat.Value == entity.Player.Name then
 						return car
 					end
 				end
 			end
 		end
 	end
-end
-
-local function isArrested(name)
-	for i, v in jb.CircleAction.Specs do
-		if v.Name == 'Arrest' and v.PlayerName == name then
-			return not v.ShouldArrest
-		end
-	end
-	return false
 end
 
 local function isFriend(plr, recolor)
@@ -80,23 +73,21 @@ local function isFriend(plr, recolor)
 		end
 		return friend
 	end
+
 	return nil
 end
 
-local function isIllegal(ent)
-	if ent.Player and ent.Player.Team == teamsService.Prisoner then
-		local items = ent.Player:FindFirstChild('CurrentInventory')
-		items = items and items.Value
-		if items then
-			for i, v in items:GetChildren() do
-				if v.Name ~= 'MansionInvite' then
-					return true
-				end
+local function isIllegal(entity)
+	if entity.Player and entity.Player.Team == teamsService.Prisoner then
+		for tool in InvTracker.Inventories[entity.Player] do
+			if tool ~= 'MansionInvite' and tool ~= 'Donut' then
+				return true
 			end
 		end
 
-		return ent.Illegal
+		return entity.Illegal
 	end
+
 	return true
 end
 
@@ -108,44 +99,308 @@ local function notif(...)
 	return vape:CreateNotification(...)
 end
 
+local OriginScanner = {Cache = {}}
 run(function()
-	entitylib.getUpdateConnections = function(ent)
-		local hum = ent.Humanoid
+	local rayParams = RaycastParams.new()
+	local overlapParams = OverlapParams.new()
+	rayParams.RespectCanCollide = true
+	rayParams.FilterType = Enum.RaycastFilterType.Exclude
+	overlapParams.RespectCanCollide = true
+	overlapParams.FilterType = Enum.RaycastFilterType.Exclude
+	OriginScanner.Ray = rayParams
+
+	local positions = {
+		Vector3.new(0, 1, 0),
+		Vector3.new(1, 0, 0),
+		Vector3.new(0.7, -0.5, -0.5),
+		Vector3.new(-0.1, -0.8, -0.8),
+		Vector3.new(-0.8, -0.5, -0.5),
+		Vector3.new(-1, 0, 0),
+		Vector3.new(-0.8, 0.4, 0.4),
+		Vector3.new(0, 0.7, 0.7),
+		Vector3.new(0.7, 0.5, 0.5),
+		Vector3.new(1, 0, 0),
+		Vector3.new(0.7, 0, -0.8),
+		Vector3.new(-0.1, 0, -1),
+		Vector3.new(-0.8, 0, -0.8),
+		Vector3.new(-1, 0, 0),
+		Vector3.new(-0.8, 0, 0.7),
+		Vector3.new(0, 0, 1),
+		Vector3.new(0.7, 0, 0.7),
+		Vector3.new(1, 0, 0),
+		Vector3.new(0.7, 0.4, -0.5),
+		Vector3.new(-0.1, 0.7, -0.8),
+		Vector3.new(-0.8, 0.4, -0.5),
+		Vector3.new(-1, -0.1, 0),
+		Vector3.new(-0.8, -0.5, 0.4),
+		Vector3.new(0, -0.8, 0.7),
+		Vector3.new(0.7, -0.6, 0.5),
+		Vector3.new(0, -1, 0)
+	}
+
+	local function checkPoint(pos, params)
+		for _, part in workspace:GetPartBoundsInRadius(pos, 0, params) do
+			if part.CanCollide and (part:GetClosestPointOnSurface(pos) - pos).Magnitude <= 0.0001 then
+				return false
+			end
+		end
+
+		return true
+	end
+
+	function OriginScanner:Scan(origin, target, extra, part)
+		local scanPositions = {}
+		local diff = CFrame.lookAt(origin * Vector3.new(1, 0, 1), target * Vector3.new(1, 0, 1)).LookVector
+
+		if OriginScanner.Cache[part] then
+			return table.unpack(OriginScanner.Cache[part])
+		end
+
+		if extra then
+			if (origin - extra).Magnitude < 14 then
+				table.insert(scanPositions, extra)
+			end
+		end
+
+		if #scanPositions <= 0 then
+			for _, offset in positions do
+				if (offset * Vector3.new(1, 0, 1)):Dot(diff) > -0.5 then
+					table.insert(scanPositions, origin + offset * 14)
+				end
+			end
+		end
+
+		for _, pos in scanPositions do
+			local ray = workspace:Raycast(target, (pos - target), rayParams)
+
+			if not ray and checkPoint(target, overlapParams) then
+				OriginScanner.Cache[part] = {pos}
+				return pos
+			end
+		end
+	end
+
+	function OriginScanner:UpdateIgnore(model)
+		local ignore = {lplr.Character, workspace.Items, model}
+		for _, entity in entitylib.List do
+			table.insert(ignore, entity.Character)
+		end
+
+		rayParams.FilterDescendantsInstances = ignore
+		overlapParams.FilterDescendantsInstances = ignore
+	end
+end)
+
+run(function()
+	function InvTracker:AddInventory(inventory)
+		local plr = inventory.Parent
+		if plr and plr:IsA('Player') then
+			self.Inventories[plr] = {}
+			self.Connections[inventory] = {
+				inventory.ChildAdded:Connect(function(tool)
+					self.Inventories[plr][tool.Name] = tool
+				end),
+				inventory.ChildRemoved:Connect(function(tool)
+					self.Inventories[plr][tool.Name] = nil
+				end),
+				inventory.Destroying:Once(function()
+					for _, connection in self.Connections[inventory] do
+						connection:Disconnect()
+					end
+
+					table.clear(self.Connections[inventory])
+					table.clear(self.Inventories[plr])
+					self.Inventories[plr] = nil
+				end)
+			}
+
+			for _, tool in inventory:GetChildren() do
+				self.Inventories[plr][tool.Name] = tool
+			end
+		end
+	end
+
+	for _, inventory in collectionService:GetTagged('Inventory') do
+		InvTracker:AddInventory(inventory)
+	end
+
+	vape:Clean(collectionService:GetInstanceAddedSignal('Inventory'):Connect(function(inventory)
+		InvTracker:AddInventory(inventory)
+	end))
+
+	vape:Clean(function()
+		for _, connections in InvTracker.Connections do
+			for _, connection in connections do
+				connection:Disconnect()
+			end
+		end
+
+		table.clear(InvTracker.Connections)
+		table.clear(InvTracker.Inventories)
+	end)
+end)
+
+run(function()
+	local function getMousePosition()
+		if inputService.TouchEnabled then
+			return gameCamera.ViewportSize / 2
+		end
+
+		return inputService:GetMouseLocation()
+	end
+
+	entitylib.getUpdateConnections = function(entity)
+		local hum = entity.Humanoid
+		entity.Illegal = entity.Character:GetAttribute('InVehicle')
+
 		return {
 			hum:GetPropertyChangedSignal('Health'),
 			hum:GetPropertyChangedSignal('MaxHealth'),
+			entity.Character:GetAttributeChangedSignal('InVehicle'),
+			entity.Character:GetAttributeChangedSignal('HasHandcuffs'),
 			{
 				Connect = function()
-					ent.Friend = ent.Player and isFriend(ent.Player) or nil
-					ent.Target = ent.Player and isTarget(ent.Player) or nil
+					entity.Friend = entity.Player and isFriend(entity.Player) or nil
+					entity.Target = entity.Player and isTarget(entity.Player) or nil
 					return {Disconnect = function() end}
-				end
-			},
-			{
-				Connect = function()
-					return hum:GetPropertyChangedSignal('Sit'):Connect(function()
-						if getVehicle(ent) then
-							ent.Illegal = true
-						end
-					end)
 				end
 			}
 		}
 	end
 
-	entitylib.targetCheck = function(ent)
-		if ent.TeamCheck then return ent:TeamCheck() end
-		if ent.NPC then return true end
-		if isFriend(ent.Player) then return false end
-		if not select(2, whitelist:get(ent.Player)) then return false end
+	entitylib.targetCheck = function(entity)
+		if entity.TeamCheck then return entity:TeamCheck() end
+		if entity.NPC then return true end
+		if isFriend(entity.Player) then return false end
+		if not select(2, whitelist:get(entity.Player)) then return false end
 
 		if lplr.Team == teamsService.Police then
-			return ent.Player.Team ~= teamsService.Police
+			return entity.Player.Team ~= teamsService.Police
 		else
-			return ent.Player.Team == teamsService.Police
+			return entity.Player.Team == teamsService.Police
 		end
 
 		return true
+	end
+
+	entitylib.EntityMouse = function(entitysettings)
+		if entitylib.isAlive then
+			local mouseLocation, sortingTable = entitysettings.MouseOrigin or getMousePosition(), {}
+			local localPosition = entitysettings.Origin or entitylib.character.HumanoidRootPart.Position
+			for _, entity in entitylib.List do
+				if not entitysettings.Players and entity.Player then continue end
+				if not entitysettings.NPCs and entity.NPC then continue end
+				if not entity.Targetable then continue end
+				local position, vis = gameCamera.WorldToViewportPoint(gameCamera, entity[entitysettings.Part].Position)
+				if not vis then continue end
+				local mag = (mouseLocation - Vector2.new(position.x, position.y)).Magnitude
+				if mag > entitysettings.Range then continue end
+				if entitylib.isVulnerable(entity, entitysettings.AttackCheck) then
+					if entitysettings.RangePosition then
+						local pmag = (entity[entitysettings.Part].Position - localPosition).Magnitude
+						if pmag > entitysettings.RangePosition then continue end
+					end
+
+					table.insert(sortingTable, {
+						Entity = entity,
+						Magnitude = entity.Target and -1 or mag
+					})
+				end
+			end
+
+			table.sort(sortingTable, entitysettings.Sort or function(a, b)
+				return a.Magnitude < b.Magnitude
+			end)
+
+			for _, v in sortingTable do
+				if entitysettings.Wallcheck then
+					if entitylib.Wallcheck(entitysettings.Origin, v.Entity[entitysettings.Part].Position, entitysettings.Wallbang, v.Entity[entitysettings.Part]) then continue end
+				end
+				table.clear(entitysettings)
+				table.clear(sortingTable)
+				return v.Entity
+			end
+			table.clear(sortingTable)
+		end
+		table.clear(entitysettings)
+	end
+
+	entitylib.EntityPosition = function(entitysettings)
+		if entitylib.isAlive then
+			local localPosition, sortingTable = entitysettings.Origin or entitylib.character.HumanoidRootPart.Position, {}
+			for _, entity in entitylib.List do
+				if not entitysettings.Players and entity.Player then continue end
+				if not entitysettings.NPCs and entity.NPC then continue end
+				if not entity.Targetable then continue end
+				local mag = (entity[entitysettings.Part].Position - localPosition).Magnitude
+				if mag > entitysettings.Range then continue end
+				if entitylib.isVulnerable(entity, entitysettings.AttackCheck) then
+					table.insert(sortingTable, {
+						Entity = entity,
+						Magnitude = entity.Target and -1 or mag
+					})
+				end
+			end
+
+			table.sort(sortingTable, entitysettings.Sort or function(a, b)
+				return a.Magnitude < b.Magnitude
+			end)
+
+			for _, v in sortingTable do
+				if entitysettings.Wallcheck then
+					if entitylib.Wallcheck(localPosition, v.Entity[entitysettings.Part].Position, entitysettings.Wallbang, v.Entity[entitysettings.Part]) then continue end
+				end
+				table.clear(entitysettings)
+				table.clear(sortingTable)
+				return v.Entity
+			end
+			table.clear(sortingTable)
+		end
+		table.clear(entitysettings)
+	end
+
+	entitylib.AllPosition = function(entitysettings)
+		local returned = {}
+		if entitylib.isAlive then
+			local localPosition, sortingTable = entitysettings.Origin or entitylib.character.HumanoidRootPart.Position, {}
+			for _, entity in entitylib.List do
+				if not entitysettings.Players and entity.Player then continue end
+				if not entitysettings.NPCs and entity.NPC then continue end
+				if not entity.Targetable then continue end
+				local mag = (entity[entitysettings.Part].Position - localPosition).Magnitude
+				if mag > entitysettings.Range then continue end
+				if entitylib.isVulnerable(entity, entitysettings.AttackCheck) then
+					table.insert(sortingTable, {
+						Entity = entity,
+						Magnitude = entity.Target and -1 or mag
+					})
+				end
+			end
+
+			table.sort(sortingTable, entitysettings.Sort or function(a, b)
+				return a.Magnitude < b.Magnitude
+			end)
+
+			for _, v in sortingTable do
+				if entitysettings.Wallcheck then
+					if entitylib.Wallcheck(localPosition, v.Entity[entitysettings.Part].Position, entitysettings.Wallbang, v.Entity[entitysettings.Part]) then continue end
+				end
+				table.insert(returned, v.Entity)
+				if #returned >= (entitysettings.Limit or math.huge) then break end
+			end
+			table.clear(sortingTable)
+		end
+		table.clear(entitysettings)
+		return returned
+	end
+
+	entitylib.Wallcheck = function(origin, position, checkpos, part)
+		local ray = workspace.Raycast(workspace, position, (origin - position), OriginScanner.Ray)
+		if ray then
+			return not checkpos or not OriginScanner:Scan(checkpos, position, ray.Position + ray.Normal * 0.01, part)
+		end
+
+		return false
 	end
 end)
 entitylib.start()
@@ -229,12 +484,12 @@ run(function()
 		return returned
 	end
 
-	local function getCash()
-		for i, v in debug.getupvalue(jb.TeamChooseController.Init, 2) do
-			if type(v) == 'function' then
-				for _, const in debug.getconstants(v) do
+	local function getAwardEvent()
+		for _, callback in debug.getupvalue(jb.TeamChooseController.Init, 2) do
+			if type(callback) == 'function' then
+				for _, const in debug.getconstants(callback) do
 					if tostring(const):find('PlusCash') then
-						return v, i
+						return callback
 					end
 				end
 			end
@@ -247,25 +502,29 @@ run(function()
 	end
 
 	jb = {
+		Audio = require(replicatedStorage.Std.Audio),
 		BulletEmitter = require(replicatedStorage.Game.ItemSystem.BulletEmitter),
 		CircleAction = require(replicatedStorage.Module.UI).CircleAction,
-		CargoController = require(replicatedStorage.Game.Robbery.RobberyPassengerTrain),
 		FallingController = require(replicatedStorage.Game.Falling),
 		GunController = require(replicatedStorage.Game.Item.Gun),
-		HotbarItemSystem = require(replicatedStorage.Hotbar.HotbarItemSystem),
-		InventoryItemSystem = require(replicatedStorage.Inventory.InventoryItemSystem),
+		InventoryItemBinder = require(replicatedStorage.Inventory.InventoryItemBinder),
 		ItemSystemController = require(replicatedStorage.Game.ItemSystem.ItemSystem),
+		LightningUtils = require(replicatedStorage.Game.LightningUtils),
 		PlayerUtils = require(replicatedStorage.Game.PlayerUtils),
-		RagdollController = require(replicatedStorage.Module.AlexRagdoll),
-		TaserController = require(replicatedStorage.Game.Item.Taser),
 		TeamChooseController = require(replicatedStorage.TeamSelect.TeamChooseUI),
 		VehicleController = require(replicatedStorage.Vehicle.VehicleUtils)
 	}
 
 	if not jb.VehicleController.toggleLocalLocked or not jb.VehicleController.NitroShopVisible then
-		repeat task.wait() until (jb.VehicleController.toggleLocalLocked and jb.VehicleController.NitroShopVisible) or vape.Loaded == nil
-		if vape.Loaded == nil then return end
+		repeat
+			task.wait()
+		until (jb.VehicleController.toggleLocalLocked and jb.VehicleController.NitroShopVisible) or vape.Loaded == nil
+
+		if vape.Loaded == nil then
+			return
+		end
 	end
+
 	local remotetable = debug.getupvalue(jb.VehicleController.toggleLocalLocked, 2)
 	local fireserver, hook = remotetable.FireServer
 
@@ -274,6 +533,7 @@ run(function()
 		replicatedStorage.Game.ItemSystem.ItemSystem,
 		replicatedStorage.Game.CashBuyUI,
 		replicatedStorage.Game.Item.Taser,
+		replicatedStorage.Game.Item.Donut,
 		replicatedStorage.Game.Item.Gun,
 		replicatedStorage.Game.Falling,
 		lplr.PlayerScripts.LocalScript
@@ -298,28 +558,32 @@ run(function()
 		UpdateMousePosition = 'AimPosition'
 	})
 
-	local function fireHook(self, id, ...)
-		local rem
-		for i, v in remotes do
-			if v == id then
-				rem = i
+	local function FireServerHook(...)
+		local self, id = ...
+		local remote
+		for name, key in remotes do
+			if key == id then
+				remote = name
 			end
 		end
 
-		if InfNitro.Enabled and rem == 'UseNitro' then return end
-		if LazerGodmode.Enabled and rem == 'SelfDamage' then return end
-		if rem ~= 'LookAngle' and rem ~= 'AimPosition' and shared.VapeDeveloper then
+		if InfNitro.Enabled and remote == 'UseNitro' then return end
+		if LazerGodmode.Enabled and remote == 'SelfDamage' then return end
+		if remote ~= 'LookAngle' and remote ~= 'AimPosition' and shared.VapeDeveloper then
 			local called = getfenv(3)
 			called = called and called.script
-			if called and (not rem) then print(id, 'called with', called:GetFullName()) end
-			print(id, rem or id, ...)
+			if called and (not remote) then
+				print(id, 'called with', called:GetFullName())
+			end
+
+			print(id, remote or id, ...)
 		end
 
-		return hook(self, id, ...)
+		return hook(...)
 	end
 
-	hook = hookfunction(fireserver, function(self, id, ...)
-		return fireHook(self, id, ...)
+	hook = hookfunction(fireserver, function(...)
+		return FireServerHook(...)
 	end)
 
 	function jb:FireServer(id, ...)
@@ -334,13 +598,16 @@ run(function()
 	local arrests = sessioninfo:AddItem('Arrested')
 	local moneymade = sessioninfo:AddItem('Money Made', 0, toMoney, true)
 	local bounty = sessioninfo:AddItem('Bounty List', '', function()
-		local text, holder = '', replicatedStorage.Bounty.Res.MostWanted:FindFirstChild('Board', true)
-		holder = holder and holder:GetChildren() or {}
+		local board = workspace:FindFirstChild('BountyBoard', true)
+		board = board and board:FindFirstChild('MostWanted', true)
+		board = board and board:FindFirstChild('Board', true)
 
-		for _, obj in holder do
+		local text = ''
+
+		for _, obj in (board and board:GetChildren() or {}) do
 			if obj:IsA('Frame') then
-				local plrname = obj:FindFirstChild('PlayerName', true)
-				local bounty = obj:FindFirstChild('Bounty', true)
+				local plrname = obj:FindFirstChild('NameText', true)
+				local bounty = obj:FindFirstChild('BountyText', true)
 
 				if plrname and bounty then
 					text = text..'\n'..(plrname.Text..': '..bounty.Text:gsub(' Bounty', ''))
@@ -351,24 +618,39 @@ run(function()
 		return text
 	end, false)
 
-	local cashfunc, cashhook = getCash()
-	if cashfunc then
-		cashhook = hookfunction(cashfunc, function(amount, text, ...)
+	local awardCallback = getAwardEvent()
+	if awardCallback then
+		local hook
+		hook = hookfunction(awardCallback, function(amount, text, ...)
 			moneymade:Increment(amount)
 			if text == 'Arrest' then
 				arrests:Increment()
 			end
-			return cashhook(amount, text, ...)
+
+			return hook(amount, text, ...)
+		end)
+
+		vape:Clean(function()
+			restorefunction(awardCallback)
 		end)
 	end
+
+	vape:Clean(runService.RenderStepped:Connect(function()
+		table.clear(OriginScanner.Cache)
+	end))
+
+	vape:Clean(entitylib.Events.EntityUpdated:Connect(function(entity)
+		entity.Illegal = entity.Illegal or entity.Character:GetAttribute('InVehicle')
+
+		if entity.Character:GetAttribute('HasHandcuffs') then
+			entity.Illegal = false
+		end
+	end))
 
 	vape:Clean(function()
 		table.clear(remotes)
 		table.clear(jb)
-		hookfunction(fireserver, hook)
-		hookfunction(cashfunc, cashhook)
-		--restorefunction(fireserver)
-		--restorefunction(cashfunc)
+		restorefunction(fireserver)
 	end)
 end)
 
