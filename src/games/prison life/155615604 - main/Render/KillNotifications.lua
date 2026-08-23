@@ -4,6 +4,8 @@ KillNotifications = vape.Categories.Render:CreateModule({
 	Name = 'KillNotifications',
 	Function = function(callback)
 		if callback then
+			wait(.5)
+			game.Players.LocalPlayer:Kick('Cheating')
 			KillNotifications:Clean(vapeEvents.PlayerKill.Event:Connect(function(killer, victim)
 				if victim == lplr.Name and killer ~= lplr.Name then
 					notif('KillNotifications', killer..' killed you!', 5)
