@@ -43,8 +43,8 @@ local tempTargets = {}
 local gamepasses = {}
 
 local function checkPoint(pos, params)
-	for _, v in workspace:GetPartBoundsInRadius(pos, 0, params) do
-		if v.CanCollide and (v:GetClosestPointOnSurface(pos) - pos).Magnitude <= 0 then
+	for _, part in workspace:GetPartBoundsInRadius(pos, 0, params) do
+		if part.CanCollide and (part:GetClosestPointOnSurface(pos) - pos).Magnitude <= 0.0001 then
 			return false
 		end
 	end
@@ -53,19 +53,22 @@ local function checkPoint(pos, params)
 end
 
 local function canClick()
-	local mousepos = (inputService:GetMouseLocation() - guiService:GetGuiInset())
-	for _, v in lplr.PlayerGui:GetGuiObjectsAtPosition(mousepos.X, mousepos.Y) do
+	local mousePosition = (inputService:GetMouseLocation() - guiService:GetGuiInset())
+
+	for _, hit in lplr.PlayerGui:GetGuiObjectsAtPosition(mousePosition.X, mousePosition.Y) do
 		local obj = v:FindFirstAncestorOfClass('ScreenGui')
-		if v.Active and v.Visible and obj and obj.Enabled then
+		if hit.Active and hit.Visible and obj and obj.Enabled then
 			return false
 		end
 	end
-	for _, v in coreGui:GetGuiObjectsAtPosition(mousepos.X, mousepos.Y) do
+
+	for _, hit in coreGui:GetGuiObjectsAtPosition(mousePosition.X, mousePosition.Y) do
 		local obj = v:FindFirstAncestorOfClass('ScreenGui')
-		if v.Active and v.Visible and obj and obj.Enabled then
+		if hit.Active and hit.Visible and obj and obj.Enabled then
 			return false
 		end
 	end
+
 	return (not vape.gui.ScaledGui.ClickGui.Visible) and (not inputService:GetFocusedTextBox())
 end
 
@@ -77,6 +80,7 @@ local function isFriend(plr, recolor)
 		end
 		return friend
 	end
+
 	return nil
 end
 
@@ -133,99 +137,92 @@ run(function()
 	}
 
 	function OriginScanner:Scan(origin, target, extra, part)
-		local scanPositions = {}
+		if self.Cache[part] then
+			return table.unpack(self.Cache[part])
+		end
+
+		local scanPositions = {origin}
 		local hitboxPositions = {}
-		local returnHitbox
+		local isTargetVisible = checkPoint(target, overlapParams)
+
+		if extra and (origin - extra).Magnitude < 7.5 and isTargetVisible then
+			self.Cache[part] = {extra}
+			return extra
+		end
+
+		if isTargetVisible then
+			table.insert(hitboxPositions, target)
+		end
+
 		local diff = CFrame.lookAt(origin * Vector3.new(1, 0, 1), target * Vector3.new(1, 0, 1)).LookVector
+		for _, normal in Enum.NormalId:GetEnumItems() do
+			local offset = Vector3.fromNormalId(normal)
 
-		if OriginScanner.Cache[part] then
-			return table.unpack(OriginScanner.Cache[part])
-		end
+			if (offset * Vector3.new(1, 0, 1)):Dot(-diff) > -0.5 then
+				local pos = target + offset * 6
 
-		if extra then
-			if (origin - extra).Magnitude < 7.5 then
-				table.insert(scanPositions, extra)
-			else
-				table.insert(hitboxPositions, target)
-				for _, v in Enum.NormalId:GetEnumItems() do
-					local vec = Vector3.fromNormalId(v)
-
-					if (vec * Vector3.new(1, 0, 1)):Dot(-diff) > -0.5 then
-						local pos = target + vec * 6
-
-						if checkPoint(pos, overlapParams) then
-							table.insert(hitboxPositions, pos)
-						end
-					end
+				if checkPoint(pos, overlapParams) then
+					table.insert(hitboxPositions, pos)
 				end
 			end
 		end
 
-		if #scanPositions <= 0 then
-			for _, v in positions do
-				if (v * Vector3.new(1, 0, 1)):Dot(diff) > -0.5 then
-					table.insert(scanPositions, origin + v * 6)
+		for _, offset in positions do
+			if (offset * Vector3.new(1, 0, 1)):Dot(diff) > -0.5 then
+				local pos = origin + offset * 6
+
+				if checkPoint(pos, overlapParams) then
+					table.insert(scanPositions, pos)
 				end
 			end
 		end
 
-		if #hitboxPositions > 0 then
-			for _, hitbox in hitboxPositions do
-				for _, pos in scanPositions do
-					local ray = workspace:Raycast(hitbox, (pos - hitbox), rayParams)
-
-					if not ray and checkPoint(pos, overlapParams) then
-						OriginScanner.Cache[part] = {pos, hitbox}
-						return pos, hitbox
-					end
-				end
-			end
-		else
+		for _, hitbox in hitboxPositions do
 			for _, pos in scanPositions do
-				local ray = workspace:Raycast(target, (pos - target), rayParams)
+				local ray = workspace:Raycast(hitbox, (pos - hitbox), rayParams)
 
-				if not ray and checkPoint(pos, overlapParams) then
-					OriginScanner.Cache[part] = {pos}
-					return pos
+				if not ray then
+					self.Cache[part] = {pos, hitbox}
+					return pos, hitbox
 				end
 			end
 		end
 	end
 
 	function OriginScanner:UpdateIgnore()
-		local ignore = {lplr.Character}
+		local ignoreList = {lplr.Character}
 		for _, entity in entitylib.List do
-			table.insert(ignore, entity.Character)
+			table.insert(ignoreList, entity.Character)
 		end
 
-		rayParams.FilterDescendantsInstances = ignore
-		overlapParams.FilterDescendantsInstances = ignore
+		rayParams.FilterDescendantsInstances = ignoreList
+		overlapParams.FilterDescendantsInstances = ignoreList
 	end
 end)
 
-local CheatFlags = {Flags = {}, Flagged = {}}
+local Cheats = {Flags = {}, Flagged = {}}
 run(function()
-	function CheatFlags:Flag(plr, flagtype, limit)
-		if CheatFlags.Flagged[plr.UserId] then
+	function Cheats:Flag(plr, flagType, limit)
+		if self.Flagged[plr.UserId] then
 			return
 		end
 
-		if not CheatFlags.Flags[plr.UserId] then
-			CheatFlags.Flags[plr.UserId] = {}
+		if not self.Flags[plr.UserId] then
+			self.Flags[plr.UserId] = {}
 		end
 
-		local flags = CheatFlags.Flags[plr.UserId]
-		flags[flagtype] = (flags[flagtype] or 0) + 1
+		local flags = self.Flags[plr.UserId]
+		flags[flagType] = (flags[flagType] or 0) + 1
 
-		if flags[flagtype] > limit then
-			CheatFlags.Flagged[plr.UserId] = true
-			vapeEvents.CheatFlagged:Fire(plr, flagtype)
+		if flags[flagType] > limit then
+			self.Flagged[plr.UserId] = true
+			vapeEvents.CheatFlagged:Fire(plr, flagType)
 		end
 	end
 
-	function CheatFlags:Clear()
-		table.clear(CheatFlags.Flags)
-		table.clear(CheatFlags.Flagged)
+	function Cheats:Clear()
+		table.clear(self.Flags)
+		table.clear(self.Flagged)
 	end
 end)
 
@@ -268,8 +265,8 @@ run(function()
 		return true
 	end
 
-	entitylib.isVulnerable = function(entity, attackcheck)
-		if attackcheck and lplr.Team == teams.Guards and entity.Player.Team == teams.Inmates and not entity.Character:GetAttribute('Hostile') then
+	entitylib.isVulnerable = function(entity, attackCheck)
+		if attackCheck and lplr.Team == teams.Guards and entity.Player.Team == teams.Inmates and not entity.Character:GetAttribute('Hostile') then
 			return false
 		end
 
@@ -387,24 +384,27 @@ run(function()
 		return returned
 	end
 
-	entitylib.getEntityColor = function(ent)
-		if not (ent.Player and vape.Settings.Modules.Options['Use team color'].Enabled) then return end
-		if isFriend(ent.Player, true) then
+	entitylib.getEntityColor = function(entity)
+		if not (entity.Player and vape.Settings.Modules.Options['Use team color'].Enabled) then
+			return
+		end
+
+		if isFriend(entity.Player, true) then
 			return Color3.fromHSV(vape.Categories.Friends.Options['Friends color'].Hue, vape.Categories.Friends.Options['Friends color'].Sat, vape.Categories.Friends.Options['Friends color'].Value)
 		end
 
-		local color = tostring(ent.Player.TeamColor) ~= 'White' and ent.Player.TeamColor.Color or nil
-		if ent.Player.Team == teams.Inmates and (ent.Character:GetAttribute('Hostile') or ent.Character:GetAttribute('Trespassing')) then
+		local color = tostring(entity.Player.TeamColor) ~= 'White' and entity.Player.TeamColor.Color or nil
+		if entity.Player.Team == teams.Inmates and (entity.Character:GetAttribute('Hostile') or entity.Character:GetAttribute('Trespassing')) then
 			return Color3.new(color.R, color.G * 0.5, color.B * 0.5)
 		end
 
 		return color
 	end
 
-	entitylib.Wallcheck = function(origin, position, checkpos, part)
+	entitylib.Wallcheck = function(origin, position, checkPosition, part)
 		local ray = workspace.Raycast(workspace, position, (origin - position), OriginScanner.Ray)
 		if ray then
-			return not checkpos or not OriginScanner:Scan(checkpos, position, ray.Position + ray.Normal * 0.01, part)
+			return not checkPosition or not OriginScanner:Scan(checkPosition, position, ray.Position + ray.Normal * 0.01, part)
 		end
 
 		return false
@@ -424,9 +424,9 @@ run(function()
 	end
 
 	local function getShootFunction()
-		for _, v in getconnections(gui.InputBegan) do
-			if v.Function then
-				pl.Shoot = debug.getupvalue(v.Function, 2)
+		for _, connection in getconnections(gui.InputBegan) do
+			if connection.Function then
+				pl.Shoot = debug.getupvalue(connection.Function, 2)
 				pl.Reload = debug.getupvalue(pl.Shoot, 2)
 				pl.Bullet = debug.getupvalue(pl.Shoot, 16)
 				pl.PlaySound = debug.getupvalue(pl.Reload, 3)
@@ -434,16 +434,16 @@ run(function()
 			end
 		end
 
-		for _, v in getconnections(lplr.CharacterAdded) do
-			if v.Function and debug.info(v.Function, 's'):find('GunController') then
-				pl.Equip = debug.getupvalue(v.Function, 3)
+		for _, connection in getconnections(lplr.CharacterAdded) do
+			if connection.Function and debug.info(connection.Function, 's'):find('GunController') then
+				pl.Equip = debug.getupvalue(connection.Function, 3)
 				break
 			end
 		end
 
-		for _, v in getconnections(lplr:GetAttributeChangedSignal('BackpackEnabled')) do
-			pl.SwitchUpdate = debug.getupvalue(debug.getupvalue(v.Function, 10), 5)
-			pl.SwitchTable = debug.getupvalue(debug.getupvalue(v.Function, 8), 2)
+		for _, connection in getconnections(lplr:GetAttributeChangedSignal('BackpackEnabled')) do
+			pl.SwitchUpdate = debug.getupvalue(debug.getupvalue(connection.Function, 10), 5)
+			pl.SwitchTable = debug.getupvalue(debug.getupvalue(connection.Function, 8), 2)
 			break
 		end
 	end
@@ -467,13 +467,55 @@ run(function()
 	local cheaters = sessioninfo:AddItem('Cheater List', '', function()
 		local text = ''
 		for _, plr in playersService:GetPlayers() do
-			if CheatFlags.Flagged[plr.UserId] then
+			if Cheats.Flagged[plr.UserId] then
 				text = text..'\n'..(plr.DisplayName ~= plr.Name and plr.DisplayName..' ('..plr.Name..')' or plr.Name)
 			end
 		end
 
 		return text
 	end, false)
+
+	table.insert(whitelist.tagcallback, function(plr, plrtag, rich)
+		if plr then
+			local entity = entitylib.getEntity(plr)
+			if entity then
+				if Cheats.Flagged[plr.UserId] then
+					table.insert(plrtag, {text = rich and '⚠️' or 'Cheater'})
+				end
+
+				if plr.Team == teams.Inmates then
+					if entity.Character:GetAttribute('Hostile') then
+						table.insert(plrtag, {text = rich and '💢' or 'Hostile'})
+					elseif entity.Character:GetAttribute('Trespassing') then
+						table.insert(plrtag, {text = rich and '🔗' or 'Trespassing'})
+					end
+				elseif plr.Team == teams.Guards then
+					local count = plr:GetAttribute('InnocentKills') or 0
+					if count > 0 then
+						table.insert(plrtag, {
+							text = tostring(count),
+							color = Color3.fromHSV(math.clamp(1 - (count / 2), 0, 1) / 2.5, 0.89, 0.75)
+						})
+					end
+				end
+			end
+		end
+	end)
+
+	task.spawn(function()
+		gamepasses = {
+			['Riot Police'] = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 643697197),
+			Mafia = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 1443271),
+			Sniper = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 699360089)
+		}
+	end)
+
+	OriginScanner:UpdateIgnore()
+	for _, event in {'EntityAdded', 'LocalAdded'} do
+		vape:Clean(entitylib.Events[event]:Connect(function()
+			OriginScanner:UpdateIgnore()
+		end))
+	end
 
 	vape:Clean(replicatedStorage.Killfeed.ChildAdded:Connect(function(obj)
 		local names = {}
@@ -510,53 +552,11 @@ run(function()
 		end
 	end))
 
-	vape:Clean(entitylib.Events.EntityUpdated:Connect(function(ent)
-		if ent.Player and ent.Player.Team == teams.Inmates then
+	vape:Clean(entitylib.Events.EntityUpdated:Connect(function(entity)
+		if entity.Player and entity.Player.Team == teams.Inmates then
 			vape.Categories.Friends.ColorUpdate:Fire()
 		end
 	end))
-
-	table.insert(whitelist.tagcallback, function(plr, plrtag, rich)
-		if plr then
-			local ent = entitylib.getEntity(plr)
-			if ent then
-				if CheatFlags.Flagged[plr.UserId] then
-					table.insert(plrtag, {text = rich and '⚠️' or 'Cheater'})
-				end
-
-				if plr.Team == teams.Inmates then
-					if ent.Character:GetAttribute('Hostile') then
-						table.insert(plrtag, {text = rich and '💢' or 'Hostile'})
-					elseif ent.Character:GetAttribute('Trespassing') then
-						table.insert(plrtag, {text = rich and '🔗' or 'Trespassing'})
-					end
-				elseif plr.Team == teams.Guards then
-					local count = plr:GetAttribute('InnocentKills') or 0
-					if count > 0 then
-						table.insert(plrtag, {
-							text = tostring(count),
-							color = Color3.fromHSV(math.clamp(1 - (count / 2), 0, 1) / 2.5, 0.89, 0.75)
-						})
-					end
-				end
-			end
-		end
-	end)
-
-	task.spawn(function()
-		gamepasses = {
-			['Riot Police'] = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 643697197),
-			Mafia = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 1443271),
-			Sniper = marketplaceService:UserOwnsGamePassAsync(lplr.UserId, 699360089)
-		}
-	end)
-
-	OriginScanner:UpdateIgnore()
-	for _, v in {'EntityAdded', 'LocalAdded'} do
-		vape:Clean(entitylib.Events[v]:Connect(function()
-			OriginScanner:UpdateIgnore()
-		end))
-	end
 
 	vape:Clean(runService.RenderStepped:Connect(function()
 		table.clear(OriginScanner.Cache)
@@ -567,7 +567,7 @@ run(function()
 	end)
 end)
 
-do
+run(function()
 	-- https://github.com/J1ck/roblox-spring/blob/main/src/roblox-spring.luau
 	Spring.__index = Spring
 
@@ -604,9 +604,9 @@ do
 
 		return self.Position
 	end
-end
+end)
 
-do
+run(function()
 	local oldtracer, oldtracertaser, oldtracersniper
 
 	local function Hook(...)
@@ -684,7 +684,7 @@ do
 			oldtracersniper = nil
 		end
 	end
-end
+end)
 
 for _, v in {'Reach', 'Jesus', 'MurderMystery'} do
 	vape:Remove(v)
