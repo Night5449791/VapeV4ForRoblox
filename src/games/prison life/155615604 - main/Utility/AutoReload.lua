@@ -55,21 +55,6 @@ AutoReload = vape.Categories.Utility:CreateModule({
 					end
 				end)
 			end)
-
-			-- reimplementation of playsound to get rid of the bad error
-			oldplaysound = hookfunction(pl.PlaySound, function(sound)
-				local sound = debug.getupvalue(pl.Shoot, 1)
-				sound = sound and sound:FindFirstChild('Handle')
-				sound = sound and sound:FindFirstChild(sound)
-
-				if sound then
-					local clone = sound:Clone()
-					clone.Parent = sound.Parent
-					clone:Play()
-
-					task.delay(5, clone.Destroy, clone)
-				end
-			end)
 		else
 			TracerHook:Remove('AutoReload')
 			if oldplaysound then
