@@ -57,15 +57,6 @@ AutoReload = vape.Categories.Utility:CreateModule({
 			end)
 		else
 			TracerHook:Remove('AutoReload')
-			if oldplaysound then
-				if restorefunction then
-					restorefunction(pl.PlaySound)
-				else
-					hookfunction(pl.PlaySound, oldplaysound)
-				end
-
-				oldplaysound = nil
-			end
 		end
 	end,
 	Tooltip = 'Automatically reload after reaching 0 bullets'
