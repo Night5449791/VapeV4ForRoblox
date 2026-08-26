@@ -19,7 +19,7 @@ local function playAnimation(char)
 		local currentanim = anim
 		anim:Play()
 
-		BannedAnimationPlayer:Clean(anim.Stopped:Connect(function()
+		BannedAnim:Clean(anim.Stopped:Connect(function()
 			if currentanim == anim then
 				anim:Play()
 			end
@@ -29,11 +29,11 @@ local function playAnimation(char)
 	end
 end
 
-BannedAnimPlayer = vape.Categories.Blatant:CreateModule({
-	Name = 'BannedAnimationPlayer',
+BannedAnim = vape.Categories.Blatant:CreateModule({
+	Name = 'BannedAnim',
 	Function = function(callback)
 		if callback then
-			BannedAnimationPlayer:Toggle()
+			BannedAnim:Toggle()
 
 			animobject = Instance.new('Animation')
 			animobject.AnimationId = 'rbxassetid://148840371' or "rbxassetid://5918726674"
@@ -42,8 +42,8 @@ BannedAnimPlayer = vape.Categories.Blatant:CreateModule({
 				playAnimation(entitylib.character)
 			end
 
-			BannedAnimationPlayer:Clean(entitylib.Events.LocalAdded:Connect(playAnimation))
-			BannedAnimationPlayer:Clean(animobject)
+			BannedAnim:Clean(entitylib.Events.LocalAdded:Connect(playAnimation))
+			BannedAnim:Clean(animobject)
 		else
 			if anim then
 				anim:Stop()
