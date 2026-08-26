@@ -4,10 +4,6 @@ local Priority
 local Speed
 local anim, animobject
 
-local function playAnimation(char)
-	anim = char.Humanoid.Animator:LoadAnimation(animobject)
-end
-
 BannedAnim = vape.Categories.Blatant:CreateModule({
 	Name = 'BannedAnim',
 	Function = function(callback)
@@ -18,14 +14,7 @@ BannedAnim = vape.Categories.Blatant:CreateModule({
 			animobject.AnimationId = 'rbxassetid://148840371' or "rbxassetid://5918726674"
 
 			if entitylib.isAlive then
-				playAnimation(entitylib.character)
-			end
-
-			BannedAnim:Clean(entitylib.Events.LocalAdded:Connect(playAnimation))
-			BannedAnim:Clean(animobject)
-		else
-			if anim then
-				anim:Stop()
+				lplr.Character:LoadAnimation(animobject)
 			end
 		end
 	end,
