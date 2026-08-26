@@ -5,26 +5,7 @@ local Speed
 local anim, animobject
 
 local function playAnimation(char)
-	local animcheck = anim
-	if animcheck then
-		anim = nil
-		animcheck:Stop()
-	end
-
-	local suc, res = pcall(function()
-		anim = char.Humanoid.Animator:LoadAnimation(animobject)
-	end)
-
-	if suc then
-		local currentanim = anim
-		anim:Play()
-
-		BannedAnim:Clean(anim.Stopped:Connect(function()
-			notif('BannedAnim', 'u died lol', 5, 'warning')
-		end))
-	else
-		notif('AnimationPlayer', 'failed to load anim : '..(res or 'invalid animation id'), 5, 'warning')
-	end
+	anim = char.Humanoid.Animator:LoadAnimation(animobject)
 end
 
 BannedAnim = vape.Categories.Blatant:CreateModule({
