@@ -1,12 +1,6 @@
 local BannedAnim
 
 local function playAnimation(char)
-    local animcheck = anim
-    if animcheck then
-        anim = nil
-        animcheck:Stop()
-    end
-
     anim = char.Humanoid.Animator:LoadAnimation(animobject)
 end
 
