@@ -4,6 +4,7 @@ local Options
 local AutoJump
 local AutoJumpCustom
 local AutoJumpValue
+local CustomProperties
 local w, s, a, d = 0, 0, 0, 0
 
 Speed = vape.Categories.Blatant:CreateModule({
@@ -127,7 +128,7 @@ Options = {
 		Darker = true,
 		Visible = false
 	}),
-	TPTiming = tick(),
+	TPTiming = os.clock(),
 	rayCheck = RaycastParams.new()
 }
 Options.rayCheck.RespectCanCollide = true

@@ -54,18 +54,8 @@ local function finishLoading()
 			local teleportScript = [[
 				shared.vapereload = true
 				if shared.VapeDeveloper then
-					delfile("newvape/main.lua")
-					delfolder('newvape/libraries')
-					delfolder('newvape/games')
-					delfolder('newvape/assets')
-					delfolder('newvape/guis')
 					loadstring(readfile('newvape/loader.lua'), 'loader')()
 				else
-					delfile("newvape/main.lua")
-					delfolder('newvape/libraries')
-					delfolder('newvape/games')
-					delfolder('newvape/assets')
-					delfolder('newvape/guis')
 					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true), 'loader')()
 				end
 			]]
@@ -82,8 +72,8 @@ local function finishLoading()
 
 	if not shared.vapereload then
 		if not vape.Categories then return end
-		if vape.Categories.Main.Options['GUI bind indicator'].Enabled then
-			vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.Keybind, ' + '):upper()..' to open GUI', 5)
+		if vape.Settings.GUI.Options['GUI bind indicator'].Enabled then
+			vape:CreateNotification('Finished Loading', vape.VapeButton and 'Press the button in the top right to open GUI' or 'Press '..table.concat(vape.GUIBind.Keys, ' + '):upper()..' to open GUI', 5)
 		end
 	end
 end
@@ -91,7 +81,7 @@ end
 if not isfile('newvape/profiles/gui.txt') then
 	writefile('newvape/profiles/gui.txt', 'new')
 end
-local gui = readfile('newvape/profiles/gui.txt')
+local gui = 'new'--readfile('newvape/profiles/gui.txt')
 
 if not isfolder('newvape/assets/'..gui) then
 	makefolder('newvape/assets/'..gui)
