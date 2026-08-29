@@ -7,7 +7,7 @@ Desync = vape.Categories.Blatant:CreateModule({
 		if callback then
 			raknet.desync(true)
 		else
-			raknet.desync(true)
+			raknet.desync(false)
 		end
 	end,
 	Tooltip = 'Prevent the server from replicating your current position to other players.'
