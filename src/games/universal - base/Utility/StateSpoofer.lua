@@ -6,11 +6,6 @@ StateSpoofer = vape.Categories.Utility:CreateModule({
 	Name = 'StateSpoofer',
 	Function = function(callback)
 		if callback then
-			if not rakNetCheck('StateSpoofer') then
-				StateSpoofer:Toggle()
-				return
-			end
-
 			hook = function(packet)
 				if packet.AsArray[1] == 0x1b then
 					local data = packet.AsBuffer
