@@ -1,9 +1,12 @@
 local Killaura
 local Targets
+local CPS
+local SwingRange
 local AttackRange
 local AngleSlider
 local Max
 local Mouse
+local Lunge
 local BoxSwingColor
 local BoxAttackColor
 local ParticleTexture
@@ -13,14 +16,15 @@ local ParticleSize
 local Face
 local Overlay = OverlapParams.new()
 Overlay.FilterType = Enum.RaycastFilterType.Include
-local Particles, Boxes, AttackDelay = {}, {}, tick()
+local Particles, Boxes, AttackDelay = {}, {}, os.clock()
 
 local function getAttackData()
 	if Mouse.Enabled then
 		if not inputService:IsMouseButtonPressed(0) then return false end
 	end
 
-	return true
+	local tool = getTool()
+	return tool and tool:FindFirstChildWhichIsA('TouchTransmitter', true) or nil, tool
 end
 
 Killaura = vape.Categories.Blatant:CreateModule({
@@ -28,40 +32,54 @@ Killaura = vape.Categories.Blatant:CreateModule({
 	Function = function(callback)
 		if callback then
 			repeat
-				local canAttack = getAttackData()
+				local interest, tool = getAttackData()
 				local attacked = {}
 
-				if canAttack then
+				if interest then
 					local entities = entitylib.AllPosition({
-						Range = AttackRange.Value,
+						Range = SwingRange.Value,
 						Wallcheck = Targets.Walls.Enabled or nil,
 						Part = 'RootPart',
 						Players = Targets.Players.Enabled,
 						NPCs = Targets.NPCs.Enabled,
-						Limit = Max.Value,
-						AttackCheck = true,
-						SkipTeam = true
+						Limit = Max.Value
 					})
 
 					if #entities > 0 then
-						local selfpos = entitylib.character.RootPart.Position
-						local localfacing = entitylib.character.RootPart.CFrame.LookVector * Vector3.new(1, 0, 1)
+						local localPos = entitylib.character.RootPart.Position
+						local localFacing = entitylib.character.RootPart.CFrame.LookVector * Vector3.new(1, 0, 1)
 
 						for _, entity in entities do
-							local delta = (entity.RootPart.Position - selfpos)
-							local angle = math.acos(localfacing:Dot((delta * Vector3.new(1, 0, 1)).Unit))
-							if angle > (math.rad(AngleSlider.Value) / 2) then continue end
-							if lplr.Team == teams.Guards and entity.Player.Team == teams.Inmates and not entity.Character:GetAttribute('Hostile') then
+							local delta = (entity.RootPart.Position - localPos)
+							local angle = math.abs(localFacing:Angle(delta * Vector3.new(1, 0, 1)))
+							if angle > (math.rad(AngleSlider.Value) / 2) then
 								continue
 							end
 
-							targetinfo.Targets[entity] = tick() + 1
+							targetinfo.Targets[entity] = os.clock() + 1
 							table.insert(attacked, {
 								Entity = entity,
-								Check = BoxAttackColor
+								Check = delta.Magnitude > AttackRange.Value and BoxSwingColor or BoxAttackColor
 							})
 
-							replicatedStorage.meleeEvent:FireServer(entity.Player, 1, 1)
+							if AttackDelay < os.clock() then
+								AttackDelay = os.clock() + (1 / CPS.GetRandomValue())
+								tool:Activate()
+							end
+
+							if Lunge.Enabled and tool.GripUp.X == 0 then
+								break
+							end
+
+							if delta.Magnitude > AttackRange.Value then
+								continue
+							end
+
+							Overlay.FilterDescendantsInstances = {entity.Character}
+							for _, part in workspace:GetPartBoundsInBox(entity.RootPart.CFrame, Vector3.new(4, 4, 4), Overlay) do
+								firetouchinterest(interest.Parent, part, 1)
+								firetouchinterest(interest.Parent, part, 0)
+							end
 						end
 					end
 				end
@@ -84,7 +102,7 @@ Killaura = vape.Categories.Blatant:CreateModule({
 					entitylib.character.RootPart.CFrame = CFrame.lookAt(entitylib.character.RootPart.Position, Vector3.new(vec.X, entitylib.character.RootPart.Position.Y + 0.01, vec.Z))
 				end
 
-				task.wait(0.05)
+				task.wait()
 			until not Killaura.Enabled
 		else
 			for _, box in Boxes do
@@ -101,11 +119,27 @@ Killaura = vape.Categories.Blatant:CreateModule({
 Targets = Killaura:CreateTargets({
 	Players = true
 })
+CPS = Killaura:CreateTwoSlider({
+	Name = 'Attacks per Second',
+	Min = 1,
+	Max = 20,
+	DefaultMin = 12,
+	DefaultMax = 12
+})
+SwingRange = Killaura:CreateSlider({
+	Name = 'Swing range',
+	Min = 1,
+	Max = 30,
+	Default = 13,
+	Suffix = function(val)
+		return val == 1 and 'stud' or 'studs'
+	end
+})
 AttackRange = Killaura:CreateSlider({
 	Name = 'Attack range',
 	Min = 1,
-	Max = 12,
-	Default = 12,
+	Max = 30,
+	Default = 13,
 	Suffix = function(val)
 		return val == 1 and 'stud' or 'studs'
 	end
@@ -114,7 +148,7 @@ AngleSlider = Killaura:CreateSlider({
 	Name = 'Max angle',
 	Min = 1,
 	Max = 360,
-	Default = 360
+	Default = 90
 })
 Max = Killaura:CreateSlider({
 	Name = 'Max targets',
@@ -122,19 +156,25 @@ Max = Killaura:CreateSlider({
 	Max = 10,
 	Default = 10
 })
-Mouse = Killaura:CreateToggle({Name = 'Require mouse down'})
+Mouse = Killaura:CreateToggle({
+	Name = 'Require mouse down'
+})
+Lunge = Killaura:CreateToggle({
+	Name = 'Sword lunge only'
+})
 Killaura:CreateToggle({
 	Name = 'Show target',
 	Function = function(callback)
 		BoxSwingColor.Object.Visible = callback
 		BoxAttackColor.Object.Visible = callback
+
 		if callback then
 			for i = 1, 10 do
 				local box = Instance.new('BoxHandleAdornment')
 				box.Adornee = nil
 				box.AlwaysOnTop = true
-				box.Size = Vector3.new(3, 5, 3)
 				box.CFrame = CFrame.new(0, -0.5, 0)
+				box.Size = Vector3.new(3, 5, 3)
 				box.ZIndex = 0
 				box.Parent = vape.holder
 				Boxes[i] = box

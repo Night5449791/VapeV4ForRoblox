@@ -21,7 +21,7 @@ local function sendMessage(name, obj, default)
 			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(message)
 			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendPresetAsync(Presets['So close'])
 		else
-			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendPresetAsync(Presets['So close'])
+			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendPresetAsync(Presets[message] or Presets['So close'])
 		end
 	else
 		replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, 'All')
@@ -33,7 +33,7 @@ AutoToxic = vape.Categories.Utility:CreateModule({
 	Function = function(callback)
 		if callback then
 			AutoToxic:Clean(vapeEvents.CheaterKicked.Event:Connect(function(plr)
-				sendMessage('Kicked', plr, 'Kicked <obj>|Skill issue')
+				sendMessage('Kicked', plr, 'kicked <obj>| skill issue')
 			end))
 		end
 	end,
