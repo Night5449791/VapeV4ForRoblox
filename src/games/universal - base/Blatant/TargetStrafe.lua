@@ -11,6 +11,12 @@ TargetStrafe = vape.Categories.Blatant:CreateModule({
 	Name = 'TargetStrafe',
 	Function = function(callback)
 		if callback then
+			TargetStrafe:Clean(runService.PreSimulation:Connect(function()
+				if entitylib.isAlive and entitylib.character.Humanoid.Sit then
+					entitylib.character.Humanoid.Sit = false
+				end
+			end))
+
 			if not module then
 				local suc = pcall(function() module = require(lplr.PlayerScripts.PlayerModule).controls end)
 				if not suc then
