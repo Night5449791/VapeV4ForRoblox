@@ -1,7 +1,6 @@
 -- we all code for shits lol
 
 local CheaterDetector
-local cUsernames
 local Users
 
 local cUsernames = {
@@ -49,7 +48,6 @@ local cUsernames = {
 	['juanpro231ew'] = "invalid state Swimming",
 	["voidwalker5346"] = "invalid animation (car kick)",
 	["mchser3"] = "invalid state Swimming",
-	["rackasauras"] = "speed",
 	["ang5454"] = "highjump",
 	['rackasauras'] = 'speed',
 	["dobys149"] = "phase/noclip",
@@ -63,7 +61,11 @@ local cUsernames = {
 }
 
 local function playerAdded(plr)
-	local reason = (Users and table.find(Users.ListEnabled, tostring(plr.UserId))) or cUsernames[plr.Name]	
+	local reason = cUsernames[plr.Name]
+	if Users then
+		reason = table.find(Users.ListEnabled, tostring(plr.UserId)) or reason
+	end
+
 	if reason then
 		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
 		whitelist.customtags[plr.Name] = {{text = 'CHEATER', color = Color3.new(1, 0, 0)}}

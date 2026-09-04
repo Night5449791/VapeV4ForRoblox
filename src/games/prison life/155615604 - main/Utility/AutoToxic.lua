@@ -2,6 +2,10 @@ local AutoToxic
 local Toggles, Lists, Cloned, Presets = {}, {}, {}, {}
 
 local function sendMessage(name, obj, default)
+	if obj == lplr then
+		return
+	end
+
 	local message = default
 	if #Lists[name].ListEnabled > 0 then
 		if #Cloned[name] <= 0 then

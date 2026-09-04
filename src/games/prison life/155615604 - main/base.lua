@@ -518,17 +518,13 @@ run(function()
 	end
 
 	vape:Clean(replicatedStorage.Killfeed.ChildAdded:Connect(function(obj)
-		local names = {}
+		local killer = obj.Name:match('@([^%)%s]+)')
+		local victim = obj.Name:match('killed%s+([^%s]+)')
+		if not killer or not victim then
+			return
+		end
 
-		-- killer
-		local start = obj.Name:find('@')
-		local endchar = obj.Name:find(')')
-		table.insert(names, obj.Name:sub(start + 1, endchar - 1))
-
-		-- victim
-		start = obj.Name:find('killed ') + 7
-		endchar = obj.Name:find(' ', start)
-		table.insert(names, obj.Name:sub(start, endchar - 1))
+		local names = {killer, victim}
 
 		vapeEvents.PlayerKill:Fire(unpack(names))
 		if names[1] == lplr.Name then
