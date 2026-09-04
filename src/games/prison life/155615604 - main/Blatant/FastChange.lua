@@ -7,23 +7,28 @@ end
 
 local function waitForTeam(team, timeout)
     local deadline = os.clock() + timeout
-    while lplr.Team ~= team and os.clock() < deadline do
+    while (not lplr.Team or lplr.Team.Name ~= team.Name) and os.clock() < deadline do
         task.wait()
     end
-    return lplr.Team == team
+    return lplr.Team and lplr.Team.Name == team.Name
 end
 
 local function changeTeam(reqteam, team, neutralTeam)
-    if lplr.Team == team then
+    if lplr.Team and lplr.Team.Name == team.Name then
         return true
     end
 
-    if lplr.Team ~= neutralTeam then
+    if not lplr.Team or lplr.Team.Name ~= neutralTeam.Name then
         requestTeam(reqteam, neutralTeam)
-        waitForTeam(neutralTeam, 0.5)
+        if not waitForTeam(neutralTeam, 2) then
+            return false
+        end
     end
 
-    return requestTeam(reqteam, team) and waitForTeam(team, 1)
+    if not requestTeam(reqteam, team) then
+        return false
+    end
+    return waitForTeam(team, 2)
 end
 
 FastChange = vape.Categories.Blatant:CreateModule({
@@ -46,7 +51,7 @@ FastChange = vape.Categories.Blatant:CreateModule({
             return
         end
 
-        if not changeTeam(reqteam, targetTeam, neutralTeam) then
+        if not changeTeam(reqteam, targetTeam, neutralTeam) and targetName == 'Guards' then
             changeTeam(reqteam, fallbackTeam, neutralTeam)
         end
         FastChange:Toggle()
