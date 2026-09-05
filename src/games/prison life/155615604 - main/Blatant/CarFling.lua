@@ -1,14 +1,20 @@
 local CarFling
 local Target
+local Mode
 local FlingPower
 local FlickerSpeed
 
-local targetY = 178
+local oldTargetY = 178
+local newTargetY = 300
 local shakeAmount = 0.04
 local shakeSpeed = 8
-local minFollowY = -50
-local maxFollowY = 160
+local oldMinFollowY, oldMaxFollowY = -50, 160
+local newMinFollowY, newMaxFollowY = -50, 999999
 local offset = Vector3.new(1.5, 3, 11.7)
+local predictionMultiplier = 0.75
+local pingMultiplier = 1
+local minLead, maxLead = 0.08, 0.65
+local leadPullback = 3.5
 
 local carModel
 local rootPart
@@ -21,10 +27,30 @@ local function playerNames()
 	local names = {}
 	for _, player in playersService:GetPlayers() do
 		if player ~= lplr then
-			table.insert(names, player.Name)
+			table.insert(names, player.DisplayName .. ' - ' .. player.Name)
 		end
 	end
 	return names
+end
+
+local function getTargetPlayer(value)
+	local username = value:match(' %- (.+)$')
+	return username and playersService:FindFirstChild(username)
+end
+
+local function inPrison(position)
+	return position.X > 700 and position.X < 1250 and position.Z > 2100 and position.Z < 2700
+end
+
+local function getPingLead(player, speed)
+	local ping = 0
+	pcall(function()
+		ping = player:GetNetworkPing() or 0
+	end)
+	if ping <= 0 then
+		return math.clamp(speed * 0.24, 0.22, 0.85)
+	end
+	return math.clamp(ping * pingMultiplier, minLead, maxLead)
 end
 
 local function isWheel(part)
@@ -154,9 +180,15 @@ local function startFling(targetPlayer)
 
 		local predictedPosition, yaw
 		if direction then
-			local speed = math.max(horizontalVelocity.Magnitude, 16)
-			local leadTime = math.clamp(speed * 0.18, 0.18, 0.65)
-			predictedPosition = targetRoot.Position + direction * speed * leadTime
+			local speed = math.max(horizontalVelocity.Magnitude, Mode.Value == 'New' and 20 or 16)
+			local leadTime
+			if Mode.Value == 'New' then
+				leadTime = math.max(0, speed * getPingLead(targetPlayer, speed) * predictionMultiplier - leadPullback)
+				predictedPosition = targetRoot.Position + direction * leadTime
+			else
+				leadTime = math.clamp(speed * 0.18, 0.18, 0.65)
+				predictedPosition = targetRoot.Position + direction * speed * leadTime
+			end
 			yaw = math.deg(math.atan2(-direction.X, -direction.Z))
 		else
 			predictedPosition = targetRoot.Position
@@ -168,14 +200,23 @@ local function startFling(targetPlayer)
 			math.sin(shakeTime * shakeSpeed * 1.4) * shakeAmount * 0.3,
 			math.cos(shakeTime * shakeSpeed * 0.85) * shakeAmount
 		)
+		local maxFollowY = Mode.Value == 'New' and newMaxFollowY or oldMaxFollowY
+		local minFollowY = Mode.Value == 'New' and newMinFollowY or oldMinFollowY
 		local position = Vector3.new(
 			predictedPosition.X + shake.X,
 			math.clamp(predictedPosition.Y, minFollowY, maxFollowY) - 0.6 + shake.Y,
 			predictedPosition.Z + shake.Z
 		)
 		local playerCFrame = CFrame.new(position) * CFrame.Angles(0, math.rad(yaw), 0) * CFrame.new(offset)
+		local targetY = Mode.Value == 'New' and newTargetY or oldTargetY
 		local highCFrame = CFrame.new(savedX, targetY, savedZ) * CFrame.Angles(0, math.rad(yaw), 0)
-		moveCar(frameCount % FlickerSpeed.Value == 0 and playerCFrame or highCFrame, true, predictedPosition)
+		local flicker = FlickerSpeed.Value
+		if Mode.Value == 'New' and inPrison(predictedPosition) then
+			flicker = math.max(flicker, 6)
+		end
+		local usePlayer = frameCount % flicker == 0
+		local shouldFling = Mode.Value == 'Old' or usePlayer
+		moveCar(usePlayer and playerCFrame or highCFrame, shouldFling, predictedPosition)
 	end))
 end
 
@@ -187,7 +228,7 @@ CarFling = vape.Categories.Blatant:CreateModule({
 			return
 		end
 
-		local targetPlayer = playersService:FindFirstChild(Target.Value)
+		local targetPlayer = getTargetPlayer(Target.Value)
 		local character = lplr.Character
 		local humanoid = character and character:FindFirstChildOfClass('Humanoid')
 		local root = character and character:FindFirstChild('HumanoidRootPart')
@@ -213,6 +254,7 @@ CarFling = vape.Categories.Blatant:CreateModule({
 			if not waitingForDeath or not entitylib.isAlive then return end
 			local currentRoot = entitylib.character.RootPart
 			local currentHumanoid = entitylib.character.Humanoid
+			local targetY = Mode.Value == 'New' and newTargetY or oldTargetY
 			local highCFrame = CFrame.new(savedX, targetY, savedZ) * CFrame.Angles(0, math.rad(currentRoot.Orientation.Y), 0)
 			moveCar(highCFrame, false, Vector3.new(savedX, targetY, savedZ))
 			currentHumanoid.Sit = true
@@ -221,6 +263,11 @@ CarFling = vape.Categories.Blatant:CreateModule({
 		end))
 	end,
 	Tooltip = 'Flicker and fling a vehicle after you die.'
+})
+
+Mode = CarFling:CreateDropdown({
+	Name = 'Mode',
+	List = {'Old', 'New'}
 })
 
 Target = CarFling:CreateDropdown({
@@ -241,3 +288,10 @@ FlickerSpeed = CarFling:CreateSlider({
 	Default = 4,
 	Darker = true
 })
+
+playersService.PlayerAdded:Connect(function()
+	Target:Change(playerNames())
+end)
+playersService.PlayerRemoving:Connect(function()
+	Target:Change(playerNames())
+end)
