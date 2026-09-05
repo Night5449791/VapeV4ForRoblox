@@ -14,7 +14,7 @@ local cUsernames = {
 	['DawnPulseVoid'] = 'known exploiter',
 	['BestCode_BaconThx']= 'known exploiter (kerax)',   -- join .gg/prisonlife if u got flagged by this dude, we wanna laugh at u
 	['RazhulanDeveloper'] = 'known exploiter (kerax)', -- join .gg/prisonlife if u got flagged by this dude, we wanna laugh at u
-	['SaintSkirr'] = 'known exploiter (kerax)', -- not a big deal, why kerax just why
+	['SaintSkirr'] = 'known exploiter (vape)', -- not a big deal, why kerax just why
 	['centipedeinmyheads'] = 'known exploiter (kerax)', -- NOT another saint member lol, kerax user
 	-- skids list
 	["veggeta38372737"] = "kerax user, abuser", -- most kerax users are skids abusing so, yeah
