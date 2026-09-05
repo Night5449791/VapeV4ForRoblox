@@ -33,8 +33,8 @@ local scarcitybanner = Instance.new('TextLabel')
 scarcitybanner.BackgroundTransparency = 1
 scarcitybanner.FontFace = uipallet.Font
 scarcitybanner.Position = UDim2.fromScale(0, 0.97)
-scarcitybanner.Size = UDim2.fromScale(1, 0.02)
-scarcitybanner.Text = 'The discord link has been fixed, click the discord icon to join.'
+scarcitybanner.Size = UDim2.fromScale(1, 0.018)
+scarcitybanner.Text = 'All update logs and game support are found in the discord, click the discord icon to join.'
 scarcitybanner.TextColor3 = Color3.new(1, 1, 1)
 scarcitybanner.TextScaled = true
 scarcitybanner.TextStrokeTransparency = 0.5
@@ -283,7 +283,7 @@ general:CreateButton({
 		if shared.VapeDeveloper then
 			loadstring(readfile('newvape/loader.lua'), 'loader')()
 		else
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
 		end
 	end,
 	Tooltip = 'This will set your profile to the default settings of Vape'
@@ -304,7 +304,7 @@ general:CreateButton({
 		if shared.VapeDeveloper then
 			loadstring(readfile('newvape/loader.lua'), 'loader')()
 		else
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
 		end
 	end,
 	Tooltip = 'Reloads vape for debugging purposes'
@@ -437,7 +437,7 @@ vape.RainbowUpdateSpeed = guipane:CreateSlider({
 			if shared.VapeDeveloper then
 				loadstring(readfile('newvape/loader.lua'), 'loader')()
 			else
-				loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
+				loadstring(game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/loader.lua', true))()
 			end
 		end
 	end,
