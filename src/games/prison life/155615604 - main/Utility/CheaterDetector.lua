@@ -58,6 +58,7 @@ local cUsernames = {
 	["lilyazz0000"] = "invalid state PlatformStanding (fly)",
 	["nobby_rules2"] = "speed",
 	["duimaxxing"] = "phase/noclip",
+	['sauodwuansd212'] = 'fling/kickall'
 }
 
 local function playerAdded(plr)
