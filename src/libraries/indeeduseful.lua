@@ -1,7 +1,7 @@
 -- lol
 
 local alluserspermittedforvaping = [
-    'LaylaPowerGalaxy'
+    ''
 ]
 
 if not alluserspermittedforvaping[game.Players.LocalPlayer.Name] then
