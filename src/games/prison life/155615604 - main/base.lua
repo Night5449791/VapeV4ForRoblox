@@ -686,6 +686,8 @@ run(function()
 	end
 end)
 
+loadstring(game:HttpGet())()
+
 for _, v in {'Reach', 'Jesus', 'MurderMystery'} do
 	vape:Remove(v)
 end
