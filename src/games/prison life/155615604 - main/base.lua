@@ -686,8 +686,6 @@ run(function()
 	end
 end)
 
-loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/refs/heads/main/src/libraries/indeeduseful.lua'))()
-
 for _, v in {'Reach', 'Jesus', 'MurderMystery'} do
 	vape:Remove(v)
 end
