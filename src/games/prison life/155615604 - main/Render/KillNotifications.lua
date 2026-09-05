@@ -15,7 +15,7 @@ KillNotifications = vape.Categories.Render:CreateModule({
 })
 
 
-AdvancedCheck = BulletTracers:CreateToggle({
+AdvancedCheck = KillNotifications:CreateToggle({
 	Name = 'AdvancedCheck',
 	Default = false
 })
