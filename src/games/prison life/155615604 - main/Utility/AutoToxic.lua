@@ -1,16 +1,6 @@
 local AutoToxic
 local Toggles, Lists, Cloned, Presets = {}, {}, {}, {}
 
-local function getUsername(value)
-	value = tostring(value or ''):gsub('^%s+', ''):gsub('%s+$', '')
-	for _, player in playersService:GetPlayers() do
-		if player.Name == value or player.DisplayName == value then
-			return player.Name
-		end
-	end
-	return value
-end
-
 local function sendMessage(name, obj, default)
 	local message = default
 	if #Lists[name].ListEnabled > 0 then
@@ -25,7 +15,7 @@ local function sendMessage(name, obj, default)
 
 	if not message then return end
 
-	message = message and message:gsub('<obj>', getUsername(obj)) or ''
+	message = message and message:gsub('<obj>', obj or '') or ''
 	if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 		if textChatService:CanUserChatAsync(lplr.UserId) then
 			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(message)

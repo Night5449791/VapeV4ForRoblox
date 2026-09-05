@@ -547,8 +547,7 @@ run(function()
 			cheaterkicked:Increment()
 
 			task.defer(function()
-				local kickedName = msg:match('^(.-)%s+kicked') or msg:match('^(.-) kicked')
-				vapeEvents.CheaterKicked:Fire(kickedName or msg:sub(1, msg:find(' ')))
+				vapeEvents.CheaterKicked:Fire(msg:sub(1, msg:find(' ')))
 			end)
 		end
 	end))
