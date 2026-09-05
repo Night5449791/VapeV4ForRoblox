@@ -1,7 +1,5 @@
 local CarFling
-local GuardTarget
-local InmateTarget
-local CriminalTarget
+local Target
 local Mode
 local FlingPower
 local FlickerSpeed
@@ -25,10 +23,10 @@ local savedX, savedZ
 local frameCount, shakeTime = 0, 0
 local waitingForDeath, flinging = false, false
 
-local function playerNames(teamName)
-	local names = {'None'}
+local function playerNames()
+	local names = {}
 	for _, player in playersService:GetPlayers() do
-		if player ~= lplr and player.Team and player.Team.Name == teamName then
+		if player ~= lplr then
 			table.insert(names, player.DisplayName .. ' - ' .. player.Name)
 		end
 	end
@@ -38,19 +36,6 @@ end
 local function getTargetPlayer(value)
 	local username = value:match(' %- (.+)$')
 	return username and playersService:FindFirstChild(username)
-end
-
-local function selectedTarget()
-	for _, value in {GuardTarget.Value, InmateTarget.Value, CriminalTarget.Value} do
-		local player = getTargetPlayer(value)
-		if player then return player end
-	end
-end
-
-local function refreshTargets()
-	GuardTarget:Change(playerNames('Guards'))
-	InmateTarget:Change(playerNames('Inmates'))
-	CriminalTarget:Change(playerNames('Criminals'))
 end
 
 local function inPrison(position)
@@ -239,13 +224,11 @@ CarFling = vape.Categories.Blatant:CreateModule({
 	Name = 'CarFling',
 	Function = function(callback)
 		if not callback then
-			AntiKillPlane:Toggle()
 			resetState()
 			return
 		end
 
-		AntiKillPlane:Toggle()
-		local targetPlayer = selectedTarget()
+		local targetPlayer = getTargetPlayer(Target.Value)
 		local character = lplr.Character
 		local humanoid = character and character:FindFirstChildOfClass('Humanoid')
 		local root = character and character:FindFirstChild('HumanoidRootPart')
@@ -287,17 +270,9 @@ Mode = CarFling:CreateDropdown({
 	List = {'Old', 'New'}
 })
 
-GuardTarget = CarFling:CreateDropdown({
-	Name = 'Guard',
-	List = playerNames('Guards')
-})
-InmateTarget = CarFling:CreateDropdown({
-	Name = 'Inmates',
-	List = playerNames('Inmates')
-})
-CriminalTarget = CarFling:CreateDropdown({
-	Name = 'Criminals',
-	List = playerNames('Criminals')
+Target = CarFling:CreateDropdown({
+	Name = 'Target',
+	List = playerNames()
 })
 FlingPower = CarFling:CreateSlider({
 	Name = 'Fling Power',
@@ -314,15 +289,9 @@ FlickerSpeed = CarFling:CreateSlider({
 	Darker = true
 })
 
-playersService.PlayerAdded:Connect(function(player)
-	player:GetPropertyChangedSignal('Team'):Connect(refreshTargets)
-	refreshTargets()
+playersService.PlayerAdded:Connect(function()
+	Target:Change(playerNames())
 end)
 playersService.PlayerRemoving:Connect(function()
-	refreshTargets()
+	Target:Change(playerNames())
 end)
-for _, player in playersService:GetPlayers() do
-	if player ~= lplr then
-		player:GetPropertyChangedSignal('Team'):Connect(refreshTargets)
-	end
-end
