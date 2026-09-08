@@ -57,11 +57,10 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				local flingPrefix = loweredMessage:match('^%.fling%s+(.+)$')
 				if PlayerFling.Enabled and flingPrefix then
 					local target = findPlayer(flingPrefix:match('^%s*(.-)%s*$'))
-					local carFling = vape.Modules.CarFling
 					if not target or not target.Player then
 						notif('PlayerFling', 'No living player found.', 5, 'warning')
-					elseif carFling and carFling.StartForPlayer then
-						carFling:StartForPlayer(target.Player)
+					elseif CarFling and CarFling.StartForPlayer then
+						CarFling:StartForPlayer(target.Player)
 					end
 					return
 				end
