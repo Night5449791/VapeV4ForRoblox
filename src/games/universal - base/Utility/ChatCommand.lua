@@ -196,11 +196,11 @@ ServerHop = ChatCommand:CreateToggle({
 ReloadVape = ChatCommand:CreateToggle({
 	Name = 'ReloadVape',
 	Default = true
+})
 
 ChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
 	Default = true
-})
 })
 
 DiedTP = ChatCommand:CreateToggle({
