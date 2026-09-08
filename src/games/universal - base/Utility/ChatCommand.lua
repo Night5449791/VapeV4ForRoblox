@@ -5,6 +5,7 @@ local Rejoin
 local ServerHop
 local ReloadVape
 local ChangeTeam
+local PlayerFling
 local oldCameraSubject
 local viewDeathConnection
 
@@ -53,6 +54,18 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				local loweredMessage = message:lower()
+				local flingPrefix = loweredMessage:match('^%.fling%s+(.+)$')
+				if PlayerFling.Enabled and flingPrefix then
+					local target = findPlayer(flingPrefix:match('^%s*(.-)%s*$'))
+					local carFling = vape.Modules.CarFling
+					if not target or not target.Player then
+						notif('PlayerFling', 'No living player found.', 5, 'warning')
+					elseif carFling and carFling.StartForPlayer then
+						carFling:StartForPlayer(target.Player)
+					end
+					return
+				end
+
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
 				if ChangeTeam.Enabled and teamCommand then
 					local teamName = teamCommand == 'g' and 'Guards'
@@ -171,7 +184,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			restoreCamera()
 		end
 	end,
-	Tooltip = 'Chat commands: .view, .unview, .tp, .team, .diedtp, .rj, .hop, .reload'
+	Tooltip = 'Chat commands: .view, .unview, .tp, .fling, .team, .diedtp, .rj, .hop, .reload'
 })
 
 PlayerTP = ChatCommand:CreateToggle({
@@ -208,6 +221,11 @@ ReloadVape = ChatCommand:CreateToggle({
 
 ChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
+	Default = true
+})
+
+PlayerFling = ChatCommand:CreateToggle({
+	Name = 'PlayerFling',
 	Default = true
 })
 
