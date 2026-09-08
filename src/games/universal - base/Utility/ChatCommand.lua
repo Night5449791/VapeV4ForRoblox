@@ -3,6 +3,7 @@ local PlayerTP
 local PlayerView
 local Rejoin
 local ServerHop
+local ReloadVape
 local oldCameraSubject
 
 local function restoreCamera()
@@ -38,6 +39,27 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				local loweredMessage = message:lower()
+				local diedTPState = loweredMessage:match('^%.diedtp%s+(on|off)$')
+				if diedTPState then
+					local DiedTP = vape.Modules.DiedTP
+					local enabled = diedTPState == 'on'
+					if DiedTP and DiedTP.Enabled ~= enabled then
+						DiedTP:Toggle()
+					end
+					return
+				end
+
+				if loweredMessage == '.reload' and ReloadVape.Enabled then
+					ReloadVape:Toggle()
+					delfile('newvape/main.lua')
+					delfolder('newvape/libraries')
+					delfolder('newvape/games')
+					delfolder('newvape/assets')
+					delfolder('newvape/guis')
+					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
+					return
+				end
+
 				if (loweredMessage == '.serverhop' or loweredMessage == '.hop') and ServerHop.Enabled then
 					notif('ServerHop', 'Searching for a new server...', 5)
 					ServerHop:Toggle()
@@ -100,7 +122,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			restoreCamera()
 		end
 	end,
-	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .rj/.rejoin to rejoin, or .serverhop/.hop to hop servers.'
+	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .diedtp on/off to toggle DiedTP, .rj/.rejoin to rejoin, .serverhop/.hop to hop servers, or .reload to reload Vape.'
 })
 
 PlayerTP = ChatCommand:CreateToggle({
@@ -122,4 +144,8 @@ Rejoin = ChatCommand:CreateToggle({
 
 ServerHop = ChatCommand:CreateToggle({
 	Name = 'ServerHop'
+})
+
+ReloadVape = ChatCommand:CreateToggle({
+	Name = 'ReloadVape'
 })
