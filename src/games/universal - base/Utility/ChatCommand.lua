@@ -40,11 +40,12 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				local loweredMessage = message:lower()
 				local diedTPState = loweredMessage:match('^%.diedtp%s+(on|off)$')
-				if diedTPState or loweredMessage == '.diedtp' then
+				if loweredMessage == '.diedtp' or diedTPState then
 					local DiedTP = vape.Modules.DiedTP
-					local enabled = diedTPState and diedTPState == 'on' or (DiedTP and not DiedTP.Enabled)
-					if DiedTP and DiedTP.Enabled ~= enabled then
-						DiedTP:Toggle()
+					if DiedTP then
+						if not diedTPState or DiedTP.Enabled ~= (diedTPState == 'on') then
+							DiedTP:Toggle()
+						end
 					end
 					return
 				end
@@ -122,7 +123,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			restoreCamera()
 		end
 	end,
-	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .diedtp on/off to toggle DiedTP, .rj/.rejoin to rejoin, .serverhop/.hop to hop servers, or .reload to reload Vape.'
+	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .diedtp to toggle DiedTP or .diedtp on/off to set it, .rj/.rejoin to rejoin, .serverhop/.hop to hop servers, or .reload to reload Vape.'
 })
 
 PlayerTP = ChatCommand:CreateToggle({
@@ -148,4 +149,8 @@ ServerHop = ChatCommand:CreateToggle({
 
 ReloadVape = ChatCommand:CreateToggle({
 	Name = 'ReloadVape'
+})
+
+DiedTP = ChatCommand:CreateToggle({
+	Name = 'DiedTP'
 })
