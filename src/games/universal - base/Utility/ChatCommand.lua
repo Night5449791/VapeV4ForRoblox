@@ -1,6 +1,8 @@
 local ChatCommand
 local PlayerTP
 local PlayerView
+local Rejoin
+local ServerHop
 local oldCameraSubject
 
 local function restoreCamera()
@@ -35,7 +37,27 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 		if callback then
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
-				if message:lower() == '.unview' and PlayerView.Enabled then
+				local loweredMessage = message:lower()
+				if (loweredMessage == '.serverhop' or loweredMessage == '.hop') and ServerHop.Enabled then
+					notif('ServerHop', 'Searching for a new server...', 5)
+					ServerHop:Toggle()
+					serverHop(nil, 'Descending')
+					return
+				end
+
+				if (loweredMessage == '.rj' or loweredMessage == '.rejoin') and Rejoin.Enabled then
+					notif('Rejoin', 'Rejoining...', 5)
+					Rejoin:Toggle()
+
+					if playersService.NumPlayers > 1 then
+						teleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
+					else
+						teleportService:Teleport(game.PlaceId)
+					end
+					return
+				end
+
+				if loweredMessage == '.unview' and PlayerView.Enabled then
 					restoreCamera()
 					return
 				end
@@ -78,7 +100,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			restoreCamera()
 		end
 	end,
-	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, or .unview to restore the camera.'
+	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .rj/.rejoin to rejoin, or .serverhop/.hop to hop servers.'
 })
 
 PlayerTP = ChatCommand:CreateToggle({
@@ -92,4 +114,12 @@ PlayerView = ChatCommand:CreateToggle({
 			restoreCamera()
 		end
 	end
+})
+
+Rejoin = ChatCommand:CreateToggle({
+	Name = 'Rejoin'
+})
+
+ServerHop = ChatCommand:CreateToggle({
+	Name = 'ServerHop'
 })
