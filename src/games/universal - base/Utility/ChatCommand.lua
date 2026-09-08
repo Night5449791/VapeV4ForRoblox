@@ -175,11 +175,13 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 })
 
 PlayerTP = ChatCommand:CreateToggle({
-	Name = 'PlayerTP'
+	Name = 'PlayerTP',
+	Default = true,
 })
 
 PlayerView = ChatCommand:CreateToggle({
 	Name = 'PlayerView',
+	Default = true,
 	Function = function(callback)
 		if callback then
 			oldCameraSubject = gameCamera.CameraSubject
