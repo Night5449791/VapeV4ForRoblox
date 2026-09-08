@@ -133,7 +133,9 @@ PlayerTP = ChatCommand:CreateToggle({
 PlayerView = ChatCommand:CreateToggle({
 	Name = 'PlayerView',
 	Function = function(callback)
-		if not callback then
+		if callback then
+			oldCameraSubject = gameCamera.CameraSubject
+		else
 			restoreCamera()
 		end
 	end
