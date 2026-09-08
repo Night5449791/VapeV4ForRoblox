@@ -16,9 +16,12 @@ end
 
 local function restoreCamera()
 	clearViewDeathConnection()
-	local cameraSubject = oldCameraSubject or (entitylib.character and entitylib.character.Humanoid)
-	if cameraSubject and gameCamera.CameraSubject ~= cameraSubject then
+	local character = lplr.Character
+	local cameraSubject = character and character:FindFirstChildOfClass('Humanoid')
+		or (entitylib.character and entitylib.character.Humanoid)
+	if cameraSubject then
 		gameCamera.CameraSubject = cameraSubject
+		gameCamera.CameraType = Enum.CameraType.Custom
 	end
 	oldCameraSubject = nil
 end
@@ -130,9 +133,12 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					gameCamera.CameraSubject = target.Humanoid
 					viewDeathConnection = target.Humanoid.Died:Connect(function()
 						viewDeathConnection = nil
-						local localHumanoid = entitylib.character and entitylib.character.Humanoid
+						local character = lplr.Character
+						local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
+							or (entitylib.character and entitylib.character.Humanoid)
 						if localHumanoid then
 							gameCamera.CameraSubject = localHumanoid
+							gameCamera.CameraType = Enum.CameraType.Custom
 						end
 					end)
 				end
