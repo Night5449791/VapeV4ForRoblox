@@ -53,19 +53,23 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				local loweredMessage = message:lower()
-				local teamCommand = loweredMessage:match('^%.team%s+([gc])$')
-				if teamCommand and ChangeTeam.Enabled then
-					local remotes = game:GetService('ReplicatedStorage'):FindFirstChild('Remotes')
-					local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
-					local teams = game:GetService('Teams')
-					local teamName = teamCommand == 'g' and 'Guards' or 'Inmates'
-					local targetTeam = teams:FindFirstChild(teamName)
-					local neutralTeam = teams:FindFirstChild('Neutral')
-					if requestTeamChange and targetTeam and neutralTeam then
-						task.wait(1.5)
-						requestTeamChange:InvokeServer(neutralTeam, 1)
-						task.wait(1)
-						requestTeamChange:InvokeServer(targetTeam, 1)
+				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
+				if ChangeTeam.Enabled and teamCommand then
+					local teamName = teamCommand == 'g' and 'Guards'
+						or teamCommand == 'i' and 'Inmates'
+						or teamCommand == 'guards' and 'Guards'
+						or teamCommand == 'inmates' and 'Inmates'
+					if teamName then
+						local remotes = game:GetService('ReplicatedStorage'):FindFirstChild('Remotes')
+						local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
+						local teams = game:GetService('Teams')
+						local neutral = teams:FindFirstChild('Neutral')
+						local targetTeam = teams:FindFirstChild(teamName)
+						if requestTeamChange and neutral and targetTeam then
+							requestTeamChange:InvokeServer(neutral, 1)
+							task.wait(1)
+							requestTeamChange:InvokeServer(targetTeam, 1)
+						end
 					end
 					return
 				end
@@ -196,11 +200,11 @@ ServerHop = ChatCommand:CreateToggle({
 ReloadVape = ChatCommand:CreateToggle({
 	Name = 'ReloadVape',
 	Default = true
-})
 
 ChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
 	Default = true
+})
 })
 
 DiedTP = ChatCommand:CreateToggle({
