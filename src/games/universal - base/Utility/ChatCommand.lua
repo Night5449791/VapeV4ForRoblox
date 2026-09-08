@@ -147,7 +147,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			restoreCamera()
 		end
 	end,
-	Tooltip = 'Use .view <display name prefix> to spectate a player, .tp <display name prefix> to teleport to them, .unview to restore the camera, .diedtp to toggle DiedTP or .diedtp on/off to set it, .rj/.rejoin to rejoin, .serverhop/.hop to hop servers, or .reload to reload Vape.'
+	Tooltip = 'Chat commands: .view, .unview, .tp, .diedtp, .rj, .hop, .reload'
 })
 
 PlayerTP = ChatCommand:CreateToggle({
@@ -166,17 +166,21 @@ PlayerView = ChatCommand:CreateToggle({
 })
 
 Rejoin = ChatCommand:CreateToggle({
-	Name = 'Rejoin'
+	Name = 'Rejoin',
+	Default = true
 })
 
 ServerHop = ChatCommand:CreateToggle({
-	Name = 'ServerHop'
+	Name = 'ServerHop',
+	Default = true
 })
 
 ReloadVape = ChatCommand:CreateToggle({
-	Name = 'ReloadVape'
+	Name = 'ReloadVape',
+	Default = true
 })
 
 DiedTP = ChatCommand:CreateToggle({
-	Name = 'DiedTP'
+	Name = 'DiedTP',
+	Default = true
 })
