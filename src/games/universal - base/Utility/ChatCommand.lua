@@ -1,10 +1,10 @@
 local ChatCommand
-local PlayerTP
-local PlayerView
-local Rejoin
-local ServerHop
-local ReloadVape
-local ChangeTeam
+local cPlayerTP
+local cPlayerView
+local cRejoin
+local cServerHop
+local cReloadVape
+local cChangeTeam
 local oldCameraSubject
 local viewDeathConnection
 
@@ -53,8 +53,9 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				local loweredMessage = message:lower()
+
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
-				if ChangeTeam.Enabled and teamCommand then
+				if cChangeTeam.Enabled and teamCommand then
 					local teamName = teamCommand == 'g' and 'Guards'
 						or teamCommand == 'i' and 'Inmates'
 						or teamCommand == 'guards' and 'Guards'
@@ -76,25 +77,24 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				if loweredMessage == '.reload' and ReloadVape.Enabled then
-					ReloadVape:Toggle()
+				if loweredMessage == '.reload' and cReloadVape.Enabled then
 					delfile('newvape/main.lua')
 					delfolder('newvape/libraries')
 					delfolder('newvape/games')
+					delfolder('newvape/assets')
+					delfolder('newvape/guis')
 					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 					return
 				end
 
-				if (loweredMessage == '.serverhop' or loweredMessage == '.hop') and ServerHop.Enabled then
+				if (loweredMessage == '.serverhop' or loweredMessage == '.hop') and cServerHop.Enabled then
 					notif('ServerHop', 'Searching for a new server...', 5)
-					ServerHop:Toggle()
 					serverHop(nil, 'Descending')
 					return
 				end
 
-				if (loweredMessage == '.rj' or loweredMessage == '.rejoin') and Rejoin.Enabled then
+				if (loweredMessage == '.rj' or loweredMessage == '.rejoin') and cRejoin.Enabled then
 					notif('Rejoin', 'Rejoining...', 5)
-					Rejoin:Toggle()
 
 					if playersService.NumPlayers > 1 then
 						teleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
@@ -110,7 +110,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				end
 
 				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
-				if command and command:lower() == 'tp' and PlayerTP.Enabled then
+				if command and command:lower() == 'tp' and cPlayerTP.Enabled then
 					prefix = prefix:match('^%s*(.-)%s*$')
 					local target = findPlayer(prefix)
 					if not target or not target.RootPart then
@@ -157,16 +157,15 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 		else
 			restoreCamera()
 		end
-	end,
-	Tooltip = 'Chat commands: .view, .unview, .tp, .team, .diedtp, .rj, .hop, .reload'
+	end
 })
 
-PlayerTP = ChatCommand:CreateToggle({
+cPlayerTP = ChatCommand:CreateToggle({
 	Name = 'PlayerTP',
 	Default = true,
 })
 
-PlayerView = ChatCommand:CreateToggle({
+cPlayerView = ChatCommand:CreateToggle({
 	Name = 'PlayerView',
 	Default = true,
 	Function = function(callback)
@@ -178,22 +177,22 @@ PlayerView = ChatCommand:CreateToggle({
 	end
 })
 
-Rejoin = ChatCommand:CreateToggle({
+cRejoin = ChatCommand:CreateToggle({
 	Name = 'Rejoin',
 	Default = true
 })
 
-ServerHop = ChatCommand:CreateToggle({
+cServerHop = ChatCommand:CreateToggle({
 	Name = 'ServerHop',
 	Default = true
 })
 
-ReloadVape = ChatCommand:CreateToggle({
+cReloadVape = ChatCommand:CreateToggle({
 	Name = 'ReloadVape',
 	Default = true
 })
 
-ChangeTeam = ChatCommand:CreateToggle({
+cChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
 	Default = true
 })
