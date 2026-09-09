@@ -76,16 +76,6 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				local diedTPState = loweredMessage:match('^%.diedtp%s+(on|off)$')
-				if loweredMessage == '.diedtp' or diedTPState then
-					if DiedTP then
-						if not diedTPState or DiedTP.Enabled ~= (diedTPState == 'on') then
-							DiedTP:Toggle()
-						end
-					end
-					return
-				end
-
 				if loweredMessage == '.reload' and ReloadVape.Enabled then
 					ReloadVape:Toggle()
 					delfile('newvape/main.lua')
@@ -207,10 +197,5 @@ ReloadVape = ChatCommand:CreateToggle({
 
 ChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
-	Default = true
-})
-
-DiedTP = ChatCommand:CreateToggle({
-	Name = 'DiedTP',
 	Default = true
 })
