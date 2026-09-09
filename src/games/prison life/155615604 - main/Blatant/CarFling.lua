@@ -1,5 +1,7 @@
 local CarFling
-local Target
+local GuardTarget
+local InmateTarget
+local CriminalTarget
 local Mode
 local FlingPower
 local FlickerSpeed
@@ -23,25 +25,32 @@ local savedX, savedZ
 local frameCount, shakeTime = 0, 0
 local waitingForDeath, flinging = false, false
 
-local function teamNames()
-	return {'Guards', 'Inmates', 'Criminals'}
-end
-
-local function getTargetPlayer(teamName)
-	if not teamName or teamName == 'None' then return nil end
+local function playerNames(teamName)
+	local names = {'None'}
 	for _, player in playersService:GetPlayers() do
 		if player ~= lplr and player.Team and player.Team.Name == teamName then
-			return player
+			table.insert(names, player.DisplayName .. ' - ' .. player.Name)
 		end
 	end
+	return names
+end
+
+local function getTargetPlayer(value)
+	local username = value:match(' %- (.+)$')
+	return username and playersService:FindFirstChild(username)
 end
 
 local function selectedTarget()
-	return getTargetPlayer(Target.Value)
+	for _, value in {GuardTarget.Value, InmateTarget.Value, CriminalTarget.Value} do
+		local player = getTargetPlayer(value)
+		if player then return player end
+	end
 end
 
 local function refreshTargets()
-	Target:Change(teamNames())
+	GuardTarget:Change(playerNames('Guards'))
+	InmateTarget:Change(playerNames('Inmates'))
+	CriminalTarget:Change(playerNames('Criminals'))
 end
 
 local function inPrison(position)
@@ -276,9 +285,17 @@ Mode = CarFling:CreateDropdown({
 	List = {'Old', 'New'}
 })
 
-Target = CarFling:CreateDropdown({
-	Name = 'Target',
-	List = teamNames()
+GuardTarget = CarFling:CreateDropdown({
+	Name = 'Guard',
+	List = playerNames('Guards')
+})
+InmateTarget = CarFling:CreateDropdown({
+	Name = 'Inmates',
+	List = playerNames('Inmates')
+})
+CriminalTarget = CarFling:CreateDropdown({
+	Name = 'Criminals',
+	List = playerNames('Criminals')
 })
 FlingPower = CarFling:CreateSlider({
 	Name = 'Fling Power',
@@ -295,9 +312,15 @@ FlickerSpeed = CarFling:CreateSlider({
 	Darker = true
 })
 
-playersService.PlayerAdded:Connect(function()
+playersService.PlayerAdded:Connect(function(player)
+	player:GetPropertyChangedSignal('Team'):Connect(refreshTargets)
 	refreshTargets()
 end)
 playersService.PlayerRemoving:Connect(function()
 	refreshTargets()
 end)
+for _, player in playersService:GetPlayers() do
+	if player ~= lplr then
+		player:GetPropertyChangedSignal('Team'):Connect(refreshTargets)
+	end
+end
