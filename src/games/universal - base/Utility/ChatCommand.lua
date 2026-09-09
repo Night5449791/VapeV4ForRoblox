@@ -81,8 +81,6 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					delfile('newvape/main.lua')
 					delfolder('newvape/libraries')
 					delfolder('newvape/games')
-					delfolder('newvape/assets')
-					delfolder('newvape/guis')
 					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 					return
 				end
