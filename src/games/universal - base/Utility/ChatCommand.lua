@@ -78,7 +78,6 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 
 				local diedTPState = loweredMessage:match('^%.diedtp%s+(on|off)$')
 				if loweredMessage == '.diedtp' or diedTPState then
-					local DiedTP = vape.Modules.DiedTP
 					if DiedTP then
 						if not diedTPState or DiedTP.Enabled ~= (diedTPState == 'on') then
 							DiedTP:Toggle()
