@@ -17,6 +17,7 @@ FastChange = vape.Categories.Blatant:CreateModule({
                 end                
             elseif ChooseTeam.Value == 'Inmates' then
                 if lplr.Team == 'Neutral' then
+                    notif('FastChange', 'wait 2s for fadeGui', 2, 'warn')
                     reqteam:InvokeServer(game:GetService("Teams"):FindFirstChild("Inmates"), 1)
                 else
                     task.wait(1)
