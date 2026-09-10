@@ -5,6 +5,7 @@ local cRejoin
 local cServerHop
 local cReloadVape
 local cChangeTeam
+local cWhitelist
 local oldCameraSubject
 local viewDeathConnection
 
@@ -102,12 +103,29 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
+				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
+				if command and (command:lower() == 'wl' or command:lower() == 'whitelist') and cWhitelist.Enabled then
+					prefix = prefix:match('^%s*(.-)%s*$')
+					local target = findPlayer(prefix)
+					local player = target and target.Player
+					if not player then
+						notif('Whitelist', 'No living player found.', 5, 'warning')
+						return
+					end
+
+					local friends = vape.Categories.Friends
+					if not table.find(friends.ListEnabled, player.Name) then
+						friends:ChangeValue(player.Name)
+					end
+					notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
+					return
+				end
+
 				if loweredMessage == '.unview' then
 					restoreCamera()
 					return
 				end
 
-				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
 				if command and command:lower() == 'tp' and cPlayerTP.Enabled then
 					prefix = prefix:match('^%s*(.-)%s*$')
 					local target = findPlayer(prefix)
@@ -192,5 +210,10 @@ cReloadVape = ChatCommand:CreateToggle({
 
 cChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
+	Default = true
+})
+
+cWhitelist = ChatCommand:CreateToggle({
+	Name = 'Whitelist',
 	Default = true
 })
