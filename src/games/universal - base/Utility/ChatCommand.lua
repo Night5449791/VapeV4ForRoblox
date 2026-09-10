@@ -47,6 +47,41 @@ local function findPlayer(prefix)
 	return nil
 end
 
+local whitelistCommands = {
+	 wl = true,
+	 whitelist = true,
+	 unwl = true,
+	 unwhitelist = true
+}
+
+local function handleWhitelistCommand(command, prefix)
+	local isUnwhitelist = command == 'unwl' or command == 'unwhitelist'
+	local target = findPlayer(prefix)
+	local player = target and target.Player
+	if not player and isUnwhitelist then
+		player = playersService:FindFirstChild(prefix)
+	end
+	if not player then
+		notif('Whitelist', 'No living player found.', 5, 'warning')
+		return
+	end
+
+	local friends = vape.Categories.Friends
+	local isWhitelisted = table.find(friends.ListEnabled, player.Name) ~= nil
+	if isUnwhitelist then
+		if isWhitelisted then
+			friends:ChangeValue(player.Name)
+		end
+		notif('Whitelist', player.DisplayName..' has been unwhitelisted.', 5)
+		return
+	end
+
+	if not isWhitelisted then
+		friends:ChangeValue(player.Name)
+	end
+	notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
+end
+
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
 	Function = function(callback)
@@ -104,32 +139,9 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				end
 
 				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
-				if command and (command:lower() == 'wl' or command:lower() == 'whitelist' or command:lower() == 'unwl' or command:lower() == 'unwhitelist') and cWhitelist.Enabled then
-					prefix = prefix:match('^%s*(.-)%s*$')
-					local isUnwhitelist = command:lower() == 'unwl' or command:lower() == 'unwhitelist'
-					local target = findPlayer(prefix)
-					local player = target and target.Player
-					if not player and isUnwhitelist then
-						player = playersService:FindFirstChild(prefix)
-					end
-					if not player then
-						notif('Whitelist', 'No living player found.', 5, 'warning')
-						return
-					end
-
-					local friends = vape.Categories.Friends
-					if isUnwhitelist then
-						if table.find(friends.ListEnabled, player.Name) then
-							friends:ChangeValue(player.Name)
-						end
-						notif('Whitelist', player.DisplayName..' has been unwhitelisted.', 5)
-						return
-					end
-
-					if not table.find(friends.ListEnabled, player.Name) then
-						friends:ChangeValue(player.Name)
-					end
-					notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
+				local loweredCommand = command and command:lower()
+				if loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
+					handleWhitelistCommand(loweredCommand, prefix:match('^%s*(.-)%s*$'))
 					return
 				end
 
@@ -138,7 +150,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				if command and command:lower() == 'tp' and cPlayerTP.Enabled then
+				if loweredCommand == 'tp' and cPlayerTP.Enabled then
 					prefix = prefix:match('^%s*(.-)%s*$')
 					local target = findPlayer(prefix)
 					if not target or not target.RootPart then
@@ -152,7 +164,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				if not command or command:lower() ~= 'view' or not cPlayerView.Enabled then
+				if loweredCommand ~= 'view' or not cPlayerView.Enabled then
 					return
 				end
 
