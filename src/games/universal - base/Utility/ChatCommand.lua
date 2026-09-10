@@ -47,22 +47,6 @@ local function findPlayer(prefix)
 	return nil
 end
 
-local function findPlayerByUsername(prefix)
-	if not prefix or prefix == '' then
-		return nil
-	end
-
-	local lowered = prefix:lower()
-	for _, entity in entitylib.List do
-		local player = entity and entity.Player
-		if entity and entity.Humanoid and entity.Humanoid.Health > 0 and player and player.Name:lower():sub(1, #lowered) == lowered then
-			return entity
-		end
-	end
-
-	return nil
-end
-
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
 	Function = function(callback)
@@ -122,15 +106,18 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
 				if command and (command:lower() == 'wl' or command:lower() == 'whitelist' or command:lower() == 'unwl' or command:lower() == 'unwhitelist') and cWhitelist.Enabled then
 					prefix = prefix:match('^%s*(.-)%s*$')
-					local target = findPlayer(prefix) or findPlayerByUsername(prefix)
+					local isUnwhitelist = command:lower() == 'unwl' or command:lower() == 'unwhitelist'
+					local target = findPlayer(prefix)
 					local player = target and target.Player
+					if not player and isUnwhitelist then
+						player = playersService:FindFirstChild(prefix)
+					end
 					if not player then
 						notif('Whitelist', 'No living player found.', 5, 'warning')
 						return
 					end
 
 					local friends = vape.Categories.Friends
-					local isUnwhitelist = command:lower() == 'unwl' or command:lower() == 'unwhitelist'
 					if isUnwhitelist then
 						if table.find(friends.ListEnabled, player.Name) then
 							friends:ChangeValue(player.Name)
