@@ -26,6 +26,27 @@ end
 
 loadLocalCheaters()
 
+local tagCallbackAdded = false
+local function addTag(plr, tags)
+	if type(tags) ~= 'table' then
+		return
+	end
+
+	local username = plr and plr.Name
+	local reason = username and cheaters[username]
+	if type(reason) ~= 'string' or reason == '' then
+		return
+	end
+
+	for _, tag in tags do
+		if tag.text == 'Exploiter' then
+			return
+		end
+	end
+
+	table.insert(tags, {text = 'Exploiter', color = Color3.new(1, 0, 0)})
+end
+
 local function trim(value)
 	return value:match('^%s*(.-)%s*$')
 end
@@ -36,11 +57,9 @@ local function findPlayer(prefix)
 	end
 
 	local lowered = prefix:lower()
-	for _, entity in entitylib.List do
-		local player = entity and entity.Player
-		local displayName = player and player.DisplayName
-		if entity and entity.Humanoid and entity.Humanoid.Health > 0
-			and displayName and displayName:lower():sub(1, #lowered) == lowered then
+	for _, player in playersService:GetPlayers() do
+		local displayName = player.DisplayName
+		if displayName and displayName:lower():sub(1, #lowered) == lowered then
 			return player
 		end
 	end
@@ -148,6 +167,10 @@ CheaterDetector = vape.Categories.Utility:CreateModule({
 	Default = true,
 	Function = function(callback)
 		if callback then
+			if not tagCallbackAdded and whitelist and whitelist.tagcallback then
+				table.insert(whitelist.tagcallback, addTag)
+				tagCallbackAdded = true
+			end
 			CheaterDetector:Clean(lplr.Chatted:Connect(handleChat))
 			CheaterDetector:Clean(playersService.PlayerAdded:Connect(playerAdded))
 			for _, v in playersService:GetPlayers() do
