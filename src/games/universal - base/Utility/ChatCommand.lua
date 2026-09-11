@@ -12,6 +12,7 @@ local viewDeathConnection
 
 local skidCommands = {
 	addskid = true,
+	 skidcmd = true,
 	rmskid = true,
 	delskid = true
 }
@@ -103,7 +104,32 @@ local function handleSkidCommand(command, args)
 	end
 
 	args = trim(args)
-	if command == 'addskid' then
+	if command == 'skidcmd' then
+		local displayPattern, reason = args:match('^(%S+)%s+(.+)$')
+		if not displayPattern or not reason then
+			notif('CheaterDetector', 'Usage: .skidcmd <displayname pattern> <reason>', 5, 'warning')
+			return
+		end
+
+		local success, matched = pcall(function()
+			local count = 0
+			local loweredPattern = displayPattern:lower()
+			for _, player in playersService:GetPlayers() do
+				if player.DisplayName:lower():find(loweredPattern) then
+					vape.Libraries.addCheater(player.Name, reason)
+					count += 1
+				end
+			end
+			return count
+		end)
+		if not success then
+			notif('CheaterDetector', 'Invalid displayname pattern.', 5, 'warning')
+		elseif matched == 0 then
+			notif('CheaterDetector', 'No display names matched.', 5, 'warning')
+		else
+			notif('CheaterDetector', tostring(matched)..' player(s) added to the cheater list.', 5)
+		end
+	elseif command == 'addskid' then
 		local username, reason = args:match('^(%S+)%s*(.-)$')
 		if not username or username == '' then
 			notif('CheaterDetector', 'Usage: .addskid <username> [reason]', 5, 'warning')
