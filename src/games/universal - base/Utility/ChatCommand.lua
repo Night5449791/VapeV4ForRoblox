@@ -153,58 +153,63 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				if loweredCommand then
-					if skidCommands[loweredCommand] and cAddSkid.Enabled then
-						handleSkidCommand(loweredCommand, prefix)
-						return
-					elseif whitelistCommands[loweredCommand] and cWhitelist.Enabled then
-						handleWhitelistCommand(loweredCommand, trim(prefix))
-						return
-					elseif loweredCommand == 'tp' and cPlayerTP.Enabled then
-						prefix = trim(prefix)
-						local target = findPlayer(prefix)
-						if not target or not target.RootPart then
-							notif('ChatCommand', 'No living player found.', 5, 'warning')
-							return
-						end
+				if loweredCommand and skidCommands[loweredCommand] and cAddSkid.Enabled then
+					handleSkidCommand(loweredCommand, prefix)
+					return
+				end
 
-						if entitylib.character and entitylib.character.RootPart then
-							entitylib.character.RootPart.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
-						end
-						return
-					elseif loweredCommand == 'view' and cPlayerView.Enabled then
-						if not prefix then
-							return
-						end
-
-						prefix = trim(prefix)
-						local target = findPlayer(prefix)
-						if not target then
-							notif('ChatCommand', 'No living player found.', 5, 'warning')
-							return
-						end
-
-						if target.Humanoid then
-							clearViewDeathConnection()
-							gameCamera.CameraSubject = target.Humanoid
-							viewDeathConnection = target.Humanoid.Died:Connect(function()
-								viewDeathConnection = nil
-								local character = lplr.Character
-								local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
-									or (entitylib.character and entitylib.character.Humanoid)
-								if localHumanoid then
-									gameCamera.CameraSubject = localHumanoid
-									gameCamera.CameraType = Enum.CameraType.Custom
-								end
-							end)
-						end
-						return
-					end
+				if loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
+					handleWhitelistCommand(loweredCommand, trim(prefix))
+					return
 				end
 
 				if loweredMessage == '.unview' then
 					restoreCamera()
 					return
+				end
+
+				if loweredCommand == 'tp' and cPlayerTP.Enabled then
+					prefix = trim(prefix)
+					local target = findPlayer(prefix)
+					if not target or not target.RootPart then
+						notif('ChatCommand', 'No living player found.', 5, 'warning')
+						return
+					end
+
+					if entitylib.character and entitylib.character.RootPart then
+						entitylib.character.RootPart.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
+					end
+					return
+				end
+
+				if loweredCommand ~= 'view' or not cPlayerView.Enabled then
+					return
+				end
+
+				if not prefix then
+					return
+				end
+
+				prefix = trim(prefix)
+				local target = findPlayer(prefix)
+				if not target then
+					notif('ChatCommand', 'No living player found.', 5, 'warning')
+					return
+				end
+
+				if target.Humanoid then
+					clearViewDeathConnection()
+					gameCamera.CameraSubject = target.Humanoid
+					viewDeathConnection = target.Humanoid.Died:Connect(function()
+						viewDeathConnection = nil
+						local character = lplr.Character
+						local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
+							or (entitylib.character and entitylib.character.Humanoid)
+						if localHumanoid then
+							gameCamera.CameraSubject = localHumanoid
+							gameCamera.CameraType = Enum.CameraType.Custom
+						end
+					end)
 				end
 			end))
 		else
@@ -252,5 +257,10 @@ cChangeTeam = ChatCommand:CreateToggle({
 
 cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
+	Default = true
+})
+
+cAddSkid = ChatCommand:CreateToggle({
+	Name = 'AddSkid',
 	Default = true
 })
