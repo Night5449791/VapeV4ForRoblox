@@ -6,19 +6,8 @@ local cServerHop
 local cReloadVape
 local cChangeTeam
 local cWhitelist
-local cAddSkid
 local oldCameraSubject
 local viewDeathConnection
-
-local skidCommands = {
-	addskid = true,
-	rmskid = true,
-	delskid = true
-}
-
-local function trim(value)
-	return (value or ''):match('^%s*(.-)%s*$')
-end
 
 local function clearViewDeathConnection()
 	if viewDeathConnection then
@@ -48,10 +37,8 @@ local function findPlayer(prefix)
 	for _, entity in entitylib.List do
 		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
 			local player = entity.Player or entity
-			local username = player and player.Name
 			local displayName = player and player.DisplayName
-			if username and username:lower():sub(1, #lowered) == lowered
-				or displayName and displayName:lower():sub(1, #lowered) == lowered then
+			if displayName and displayName:lower():sub(1, #lowered) == lowered then
 				return entity
 			end
 		end
@@ -70,7 +57,7 @@ local whitelistCommands = {
 local function handleWhitelistCommand(command, prefix)
 	local isUnwhitelist = command == 'unwl' or command == 'unwhitelist'
 	local target = findPlayer(prefix)
-	local player = getPlayer(target)
+	local player = target and target.Player
 	if not player and isUnwhitelist then
 		player = playersService:FindFirstChild(prefix)
 	end
@@ -95,73 +82,13 @@ local function handleWhitelistCommand(command, prefix)
 	notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
 end
 
-local function resolveSkidTarget(args)
-	local loweredArgs = args:lower()
-	local bestPlayer
-	local bestLength = 0
-
-	for _, entity in entitylib.List do
-		local player = entity and entity.Player
-		local displayName = player and player.DisplayName
-		local loweredDisplayName = displayName and displayName:lower()
-		if loweredDisplayName and loweredArgs:sub(1, #loweredDisplayName) == loweredDisplayName
-			and (#loweredArgs == #loweredDisplayName or loweredArgs:sub(#loweredDisplayName + 1, #loweredDisplayName + 1) == ' ')
-			and #loweredDisplayName > bestLength then
-			bestPlayer = player
-			bestLength = #loweredDisplayName
-		end
-	end
-
-	if bestPlayer then
-		return bestPlayer, trim(args:sub(bestLength + 1))
-	end
-
-	local username, reason = args:match('^(%S+)%s*(.-)$')
-	return username and playersService:FindFirstChild(username), reason or ''
-end
-
-local function handleSkidCommand(command, args)
-	local cheaters = vape.Libraries.cheaters
-	if not cheaters or not vape.Libraries.addCheater then
-		notif('CheaterDetector', 'CheaterDetector is unavailable.', 5, 'warning')
-		return
-	end
-
-	args = trim(args)
-	if command == 'addskid' then
-		local player, reason = resolveSkidTarget(args)
-		if not player then
-			notif('CheaterDetector', 'Usage: .addskid <username> [reason]', 5, 'warning')
-			return
-		end
-
-		vape.Libraries.addCheater(player.Name, reason ~= '' and reason or 'manual')
-		notif('CheaterDetector', player.DisplayName..' added to the cheater list.', 5)
-	elseif command == 'rmskid' then
-		if vape.Libraries.removeCheater(args) then
-			notif('CheaterDetector', args..' removed from the cheater list.', 5)
-		else
-			notif('CheaterDetector', 'No cheater found for '..(args ~= '' and args or 'the provided username')..'.', 5, 'warning')
-		end
-	elseif args == '' then
-		vape.Libraries.clearCheaters()
-		notif('CheaterDetector', 'Cheater list cleared.', 5)
-	elseif vape.Libraries.removeCheater(args) then
-		notif('CheaterDetector', args..' removed from the cheater list.', 5)
-	else
-		notif('CheaterDetector', 'No cheater found for '..args..'.', 5, 'warning')
-	end
-end
-
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
 	Function = function(callback)
 		if callback then
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
-				local loweredMessage = message:lower():match('^%s*(.-)%s*$')
-				local command, prefix = message:match('^%.(%S+)%s*(.*)$')
-				local loweredCommand = command and command:lower()
+				local loweredMessage = message:lower()
 
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
 				if cChangeTeam.Enabled and teamCommand then
@@ -211,13 +138,10 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				if loweredCommand and skidCommands[loweredCommand] and cAddSkid.Enabled then
-					handleSkidCommand(loweredCommand, prefix)
-					return
-				end
-
+				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
+				local loweredCommand = command and command:lower()
 				if loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
-					handleWhitelistCommand(loweredCommand, trim(prefix))
+					handleWhitelistCommand(loweredCommand, prefix:match('^%s*(.-)%s*$'))
 					return
 				end
 
@@ -227,7 +151,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				end
 
 				if loweredCommand == 'tp' and cPlayerTP.Enabled then
-					prefix = trim(prefix)
+					prefix = prefix:match('^%s*(.-)%s*$')
 					local target = findPlayer(prefix)
 					if not target or not target.RootPart then
 						notif('ChatCommand', 'No living player found.', 5, 'warning')
@@ -248,7 +172,7 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				prefix = trim(prefix)
+				prefix = prefix:match('^%s*(.-)%s*$')
 				local target = findPlayer(prefix)
 				if not target then
 					notif('ChatCommand', 'No living player found.', 5, 'warning')
@@ -315,10 +239,5 @@ cChangeTeam = ChatCommand:CreateToggle({
 
 cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
-	Default = true
-})
-
-cAddSkid = ChatCommand:CreateToggle({
-	Name = 'AddSkid',
 	Default = true
 })

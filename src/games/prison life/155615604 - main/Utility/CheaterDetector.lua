@@ -1,119 +1,83 @@
+-- we all code for shits lol
+
 local CheaterDetector
-local cheaters = {}
-local cheaterFile = 'newvape/cheater.json'
-local httpService = cloneref(game:GetService('HttpService'))
+local Users
 
-vape.Libraries.cheaters = cheaters
+local cUsernames = {
+	['WyRaff'] = 'speedhack,teleporting', -- vc server common
+	['PraiseDracc'] = 'known exploiter', -- since he is commonly in vc server
+	['jerry_plsnoban7'] = 'known exploiter (kerax)', -- cringe
+	['jerry_plsnoban6'] = 'known exploiter (kerax)',
+	['jerry_plsnoban5'] = 'known exploiter (kerax)',
+	['rudeeis_ab'] = 'phase/noclip ahhh hack', -- saint member, dont they even use the same thing
+	['JOJI12416'] = 'known exploiter (kerax owner)', -- kerax if u wonder
+	['DawnPulseVoid'] = 'known exploiter',
+	['BestCode_BaconThx']= 'known exploiter (kerax)',   -- join .gg/prisonlife if u got flagged by this dude, we wanna laugh at u
+	['RazhulanDeveloper'] = 'known exploiter (kerax)', -- join .gg/prisonlife if u got flagged by this dude, we wanna laugh at u
+	['SaintSkirr'] = 'known exploiter (vape)', -- not a big deal, why kerax just why
+	['centipedeinmyheads'] = 'known exploiter (kerax)', -- NOT another saint member lol, kerax user
+	-- skids list
+	["veggeta38372737"] = "kerax user, abuser", -- most kerax users are skids abusing so, yeah
+	['jbskjbg'] = 'invalid state Platform Stand exp',
+	['1267_isevil'] = 'failed fling attempt',
+	['1987_isevil'] = 'failed fling attempt',
+	['HeyiamTheCooolest'] = 'skid exploiter',
+	['Chill_baconr00'] = 'highjump', --  using vape v4 from Night5449791 and cant beat me XD
+	['gcfhjfjf4'] = 'highjump, aimbot',
+	['dannielll51'] = 'headsit exploit', -- inspired, vape antiheadsit soon.
+	['Bonjour394'] = 'skid exploiter', -- hes js a jerk
+	['princeofegypt'] = 'gets kicked for fling attempt', -- imagine gets kicked for script that kicks
+	['bilinmez4095'] = 'invalid state Platform Stand',
+	['djdjdd54321'] = 'phase/noclip into walls',
+	['cnmjm222'] = 'invisible',
+	['oyeuser67'] = 'speedhack',
+	['BetterCallMe788'] = 'fling',
+	['Avacad0731'] = 'phase/noclip',
+	['C0nquerons'] = 'Platform Stand exploit',
+	['goobyzoobytv'] = 'phase/noclip',
+	['Joni_8824'] = 'phase/noclip',
+	['jaycomputing'] = 'skid using selenium larps and got kicked',
+	['tooodarl9'] = 'skid exploiter',
+	['Henr45555455'] = 'invalid state Platform Stand',
+	['Marssimo_14'] = 'invalid state Platform Stand',
+	['boy_cantot2'] = 'invalid state Platform Stand',
+	['killerdoy372bro'] = 'invalid animation',
+	['trervoTDJ'] = 'aimbotting',
+	['Pedro9Henrique2000'] = 'phase/noclip',
+	["faizan1111789"] = "speed",
+	['juanpro231ew'] = "invalid state Swimming",
+	["voidwalker5346"] = "invalid animation (car kick)",
+	["mchser3"] = "invalid state Swimming",
+	["ang5454"] = "highjump",
+	['rackasauras'] = 'speed',
+	["dobys149"] = "phase/noclip",
+	["SyntaxK3v"] = "speed",
+	["Thacosmick_2"] = "invalid state Swimming",
+	["Unicornpoop1239508"] = "speed",
+	["kind_jack001"] = "invalid animation (invis)",
+	["lilyazz0000"] = "invalid state PlatformStanding (fly)",
+	["nobby_rules2"] = "speed",
+	["duimaxxing"] = "phase/noclip",
+	['sauodwuansd212'] = 'fling/kickall'
+}
 
-local function loadLocalCheaters()
-	table.clear(cheaters)
-	if not isfile(cheaterFile) then
-		pcall(writefile, cheaterFile, '{}')
-		return false
+local function playerAdded(plr)
+	local reason = cUsernames[plr.Name]
+	if Users then
+		reason = table.find(Users.ListEnabled, tostring(plr.UserId)) or reason
 	end
 
-	local readSuccess, contents = pcall(readfile, cheaterFile)
-	if not readSuccess or type(contents) ~= 'string' or contents == '' then
-		return false
-	end
-
-	local decodeSuccess, localCheaters = pcall(function()
-		return httpService:JSONDecode(contents)
-	end)
-	if not decodeSuccess or type(localCheaters) ~= 'table' then
-		return false
-	end
-
-	for username, reason in localCheaters do
-		if type(username) == 'string' and type(reason) == 'string' then
-			cheaters[username] = reason
-		end
-	end
-	return true
-end
-
-local function saveLocalCheaters()
-	local success, encoded = pcall(httpService.JSONEncode, httpService, cheaters)
-	if success then
-		pcall(writefile, cheaterFile, encoded)
-	end
-end
-
-local function removeCheater(username)
-	if not username or username == '' then
-		return false
-	end
-
-	local storedUsername = username
-	if not cheaters[storedUsername] then
-		for candidate in cheaters do
-			if candidate:lower() == username:lower() then
-				storedUsername = candidate
-				break
-			end
-		end
-	end
-
-	local removed = cheaters[storedUsername] ~= nil
-	cheaters[storedUsername] = nil
-	if whitelist and whitelist.customtags then
-		whitelist.customtags[storedUsername] = nil
-	end
-	if tempTargets then
-		tempTargets[storedUsername] = nil
-	end
-	return removed
-end
-
-loadLocalCheaters()
-
-local function playerAdded(plr, notifyPlayer)
-	local username = plr and plr.Name
-	local reason = username and cheaters[username]
-	if username and type(reason) == 'string' and reason ~= '' then
-		if notifyPlayer ~= false then
-			notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
-		end
-		whitelist.customtags[username] = {{text = 'Exploiter', color = Color3.new(1, 0, 0)}}
-		tempTargets[username] = true
+	if reason then
+		notif('CheaterDetector', 'Cheater Detected ('..reason..'): '..plr.Name, 60, 'alert')
+		whitelist.customtags[plr.Name] = {{text = 'Exploiter', color = Color3.new(1, 0, 0)}}
+		tempTargets[plr.Name] = true
 	end
 end
-
-local function addCheater(username, reason)
-	cheaters[username] = reason
-	saveLocalCheaters()
-	playerAdded(playersService:FindFirstChild(username), false)
-end
-
-local function clearCheaters()
-	if whitelist and whitelist.customtags then
-		for username in cheaters do
-			whitelist.customtags[username] = nil
-		end
-	end
-	table.clear(cheaters)
-	if tempTargets then
-		table.clear(tempTargets)
-	end
-	saveLocalCheaters()
-end
-
-vape.Libraries.addCheater = addCheater
-vape.Libraries.removeCheater = function(username)
-	local removed = removeCheater(username)
-	if removed then
-		saveLocalCheaters()
-	end
-	return removed
-end
-vape.Libraries.clearCheaters = clearCheaters
 
 CheaterDetector = vape.Categories.Utility:CreateModule({
 	Name = 'CheaterDetector',
-	Default = true,
 	Function = function(callback)
 		if callback then
-			loadLocalCheaters()
 			CheaterDetector:Clean(playersService.PlayerAdded:Connect(playerAdded))
 			for _, v in playersService:GetPlayers() do
 				task.spawn(playerAdded, v)
