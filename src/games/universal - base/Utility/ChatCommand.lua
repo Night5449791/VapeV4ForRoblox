@@ -6,8 +6,19 @@ local cServerHop
 local cReloadVape
 local cChangeTeam
 local cWhitelist
+local cAddSkid
 local oldCameraSubject
 local viewDeathConnection
+
+local skidCommands = {
+	addskid = true,
+	rmskid = true,
+	delskid = true
+}
+
+local function trim(value)
+	return (value or ''):match('^%s*(.-)%s*$')
+end
 
 local function clearViewDeathConnection()
 	if viewDeathConnection then
@@ -37,8 +48,10 @@ local function findPlayer(prefix)
 	for _, entity in entitylib.List do
 		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
 			local player = entity.Player or entity
+			local username = player and player.Name
 			local displayName = player and player.DisplayName
-			if displayName and displayName:lower():sub(1, #lowered) == lowered then
+			if username and username:lower():sub(1, #lowered) == lowered
+				or displayName and displayName:lower():sub(1, #lowered) == lowered then
 				return entity
 			end
 		end
@@ -57,7 +70,7 @@ local whitelistCommands = {
 local function handleWhitelistCommand(command, prefix)
 	local isUnwhitelist = command == 'unwl' or command == 'unwhitelist'
 	local target = findPlayer(prefix)
-	local player = target and target.Player
+	local player = getPlayer(target)
 	if not player and isUnwhitelist then
 		player = playersService:FindFirstChild(prefix)
 	end
@@ -88,7 +101,9 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 		if callback then
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
-				local loweredMessage = message:lower()
+				local loweredMessage = message:lower():match('^%s*(.-)%s*$')
+				local command, prefix = message:match('^%.(%S+)%s*(.*)$')
+				local loweredCommand = command and command:lower()
 
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
 				if cChangeTeam.Enabled and teamCommand then
@@ -138,60 +153,58 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
-				local loweredCommand = command and command:lower()
-				if loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
-					handleWhitelistCommand(loweredCommand, prefix:match('^%s*(.-)%s*$'))
-					return
+				if loweredCommand then
+					if skidCommands[loweredCommand] and cAddSkid.Enabled then
+						handleSkidCommand(loweredCommand, prefix)
+						return
+					elseif whitelistCommands[loweredCommand] and cWhitelist.Enabled then
+						handleWhitelistCommand(loweredCommand, trim(prefix))
+						return
+					elseif loweredCommand == 'tp' and cPlayerTP.Enabled then
+						prefix = trim(prefix)
+						local target = findPlayer(prefix)
+						if not target or not target.RootPart then
+							notif('ChatCommand', 'No living player found.', 5, 'warning')
+							return
+						end
+
+						if entitylib.character and entitylib.character.RootPart then
+							entitylib.character.RootPart.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
+						end
+						return
+					elseif loweredCommand == 'view' and cPlayerView.Enabled then
+						if not prefix then
+							return
+						end
+
+						prefix = trim(prefix)
+						local target = findPlayer(prefix)
+						if not target then
+							notif('ChatCommand', 'No living player found.', 5, 'warning')
+							return
+						end
+
+						if target.Humanoid then
+							clearViewDeathConnection()
+							gameCamera.CameraSubject = target.Humanoid
+							viewDeathConnection = target.Humanoid.Died:Connect(function()
+								viewDeathConnection = nil
+								local character = lplr.Character
+								local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
+									or (entitylib.character and entitylib.character.Humanoid)
+								if localHumanoid then
+									gameCamera.CameraSubject = localHumanoid
+									gameCamera.CameraType = Enum.CameraType.Custom
+								end
+							end)
+						end
+						return
+					end
 				end
 
 				if loweredMessage == '.unview' then
 					restoreCamera()
 					return
-				end
-
-				if loweredCommand == 'tp' and cPlayerTP.Enabled then
-					prefix = prefix:match('^%s*(.-)%s*$')
-					local target = findPlayer(prefix)
-					if not target or not target.RootPart then
-						notif('ChatCommand', 'No living player found.', 5, 'warning')
-						return
-					end
-
-					if entitylib.character and entitylib.character.RootPart then
-						entitylib.character.RootPart.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
-					end
-					return
-				end
-
-				if loweredCommand ~= 'view' or not cPlayerView.Enabled then
-					return
-				end
-
-				if not prefix then
-					return
-				end
-
-				prefix = prefix:match('^%s*(.-)%s*$')
-				local target = findPlayer(prefix)
-				if not target then
-					notif('ChatCommand', 'No living player found.', 5, 'warning')
-					return
-				end
-
-				if target.Humanoid then
-					clearViewDeathConnection()
-					gameCamera.CameraSubject = target.Humanoid
-					viewDeathConnection = target.Humanoid.Died:Connect(function()
-						viewDeathConnection = nil
-						local character = lplr.Character
-						local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
-							or (entitylib.character and entitylib.character.Humanoid)
-						if localHumanoid then
-							gameCamera.CameraSubject = localHumanoid
-							gameCamera.CameraType = Enum.CameraType.Custom
-						end
-					end)
 				end
 			end))
 		else
@@ -239,5 +252,10 @@ cChangeTeam = ChatCommand:CreateToggle({
 
 cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
+	Default = true
+})
+
+cAddSkid = ChatCommand:CreateToggle({
+	Name = 'AddSkid',
 	Default = true
 })
