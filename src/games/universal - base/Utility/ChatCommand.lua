@@ -12,7 +12,6 @@ local viewDeathConnection
 
 local skidCommands = {
 	addskid = true,
-	 skidcmd = true,
 	rmskid = true,
 	delskid = true
 }
@@ -96,6 +95,33 @@ local function handleWhitelistCommand(command, prefix)
 	notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
 end
 
+local function resolveSkidTarget(args)
+	local loweredArgs = args:lower()
+	local bestPlayer
+	local bestLength = 0
+
+	for _, entity in entitylib.List do
+		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
+			local player = entity.Player or entity
+			local displayName = player and player.DisplayName
+			local loweredDisplayName = displayName and displayName:lower()
+			if loweredDisplayName and loweredArgs:sub(1, #loweredDisplayName) == loweredDisplayName
+				and (#loweredArgs == #loweredDisplayName or loweredArgs:sub(#loweredDisplayName + 1, #loweredDisplayName + 1) == ' ')
+				and #loweredDisplayName > bestLength then
+				bestPlayer = player
+				bestLength = #loweredDisplayName
+			end
+		end
+	end
+
+	if bestPlayer then
+		return bestPlayer, trim(args:sub(bestLength + 1))
+	end
+
+	local username, reason = args:match('^(%S+)%s*(.-)$')
+	return username and playersService:FindFirstChild(username), reason or ''
+end
+
 local function handleSkidCommand(command, args)
 	local cheaters = vape.Libraries.cheaters
 	if not cheaters or not vape.Libraries.addCheater then
@@ -104,40 +130,15 @@ local function handleSkidCommand(command, args)
 	end
 
 	args = trim(args)
-	if command == 'skidcmd' then
-		local displayPattern, reason = args:match('^(%S+)%s+(.+)$')
-		if not displayPattern or not reason then
-			notif('CheaterDetector', 'Usage: .skidcmd <displayname pattern> <reason>', 5, 'warning')
-			return
-		end
-
-		local success, matched = pcall(function()
-			local count = 0
-			local loweredPattern = displayPattern:lower()
-			for _, player in playersService:GetPlayers() do
-				if player.DisplayName:lower():find(loweredPattern) then
-					vape.Libraries.addCheater(player.Name, reason)
-					count += 1
-				end
-			end
-			return count
-		end)
-		if not success then
-			notif('CheaterDetector', 'Invalid displayname pattern.', 5, 'warning')
-		elseif matched == 0 then
-			notif('CheaterDetector', 'No display names matched.', 5, 'warning')
-		else
-			notif('CheaterDetector', tostring(matched)..' player(s) added to the cheater list.', 5)
-		end
-	elseif command == 'addskid' then
-		local username, reason = args:match('^(%S+)%s*(.-)$')
-		if not username or username == '' then
+	if command == 'addskid' then
+		local player, reason = resolveSkidTarget(args)
+		if not player then
 			notif('CheaterDetector', 'Usage: .addskid <username> [reason]', 5, 'warning')
 			return
 		end
 
-		vape.Libraries.addCheater(username, reason ~= '' and reason or 'manual')
-		notif('CheaterDetector', username..' added to the cheater list.', 5)
+		vape.Libraries.addCheater(player.Name, reason ~= '' and reason or 'manual')
+		notif('CheaterDetector', player.DisplayName..' added to the cheater list.', 5)
 	elseif command == 'rmskid' then
 		if vape.Libraries.removeCheater(args) then
 			notif('CheaterDetector', args..' removed from the cheater list.', 5)
