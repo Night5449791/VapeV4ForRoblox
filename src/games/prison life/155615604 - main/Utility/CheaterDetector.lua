@@ -1,12 +1,6 @@
 local CheaterDetector
 local cheaters = {}
 local cheaterFile = 'newvape/cheater.json'
-local playerAdded
-local skidCommands = {
-	addskid = true,
-	rmskid = true,
-	delskid = true
-}
 
 vape.Libraries.cheaters = cheaters
 
@@ -63,57 +57,9 @@ local function removeCheater(username)
 	return removed
 end
 
-local function handleChat(message)
-	local command, args = message:match('^%.(%S+)%s*(.*)$')
-	command = command and command:lower()
-	if not command or not skidCommands[command] then
-		return
-	end
-
-	args = args:match('^%s*(.-)%s*$')
-	if command == 'addskid' then
-		local username, reason = args:match('^(%S+)%s*(.-)$')
-		if not username or username == '' then
-			notif('CheaterDetector', 'Usage: .addskid <username> [reason]', 5, 'warning')
-			return
-		end
-
-		cheaters[username] = reason ~= '' and reason or 'manual'
-		saveLocalCheaters()
-		playerAdded(playersService:FindFirstChild(username))
-		notif('CheaterDetector', username..' added to the cheater list.', 5)
-	elseif command == 'rmskid' then
-		if removeCheater(args) then
-			saveLocalCheaters()
-			notif('CheaterDetector', args..' removed from the cheater list.', 5)
-		else
-			notif('CheaterDetector', 'No cheater found for '..(args ~= '' and args or 'the provided username')..'.', 5, 'warning')
-		end
-	elseif args == '' then
-		table.clear(cheaters)
-		if whitelist and whitelist.customtags then
-			for username in tempTargets do
-				whitelist.customtags[username] = nil
-			end
-		end
-		if tempTargets then
-			table.clear(tempTargets)
-		end
-		saveLocalCheaters()
-		notif('CheaterDetector', 'Cheater list cleared.', 5)
-	else
-		if removeCheater(args) then
-			saveLocalCheaters()
-			notif('CheaterDetector', args..' removed from the cheater list.', 5)
-		else
-			notif('CheaterDetector', 'No cheater found for '..args..'.', 5, 'warning')
-		end
-	end
-end
-
 loadLocalCheaters()
 
-playerAdded = function(plr)
+local function playerAdded(plr)
 	local username = plr and plr.Name
 	local reason = username and cheaters[username]
 	if username and type(reason) == 'string' and reason ~= '' then
@@ -123,12 +69,40 @@ playerAdded = function(plr)
 	end
 end
 
+local function addCheater(username, reason)
+	cheaters[username] = reason
+	saveLocalCheaters()
+	playerAdded(playersService:FindFirstChild(username))
+end
+
+local function clearCheaters()
+	if whitelist and whitelist.customtags then
+		for username in cheaters do
+			whitelist.customtags[username] = nil
+		end
+	end
+	table.clear(cheaters)
+	if tempTargets then
+		table.clear(tempTargets)
+	end
+	saveLocalCheaters()
+end
+
+vape.Libraries.addCheater = addCheater
+vape.Libraries.removeCheater = function(username)
+	local removed = removeCheater(username)
+	if removed then
+		saveLocalCheaters()
+	end
+	return removed
+end
+vape.Libraries.clearCheaters = clearCheaters
+
 CheaterDetector = vape.Categories.Utility:CreateModule({
 	Name = 'CheaterDetector',
 	Default = true,
 	Function = function(callback)
 		if callback then
-			CheaterDetector:Clean(lplr.Chatted:Connect(handleChat))
 			CheaterDetector:Clean(playersService.PlayerAdded:Connect(playerAdded))
 			for _, v in playersService:GetPlayers() do
 				task.spawn(playerAdded, v)
