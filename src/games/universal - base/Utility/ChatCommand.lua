@@ -254,8 +254,3 @@ cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
 	Default = true
 })
-
-cAddSkid = ChatCommand:CreateToggle({
-	Name = 'AddSkid',
-	Default = true
-})
