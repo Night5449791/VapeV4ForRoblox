@@ -10,7 +10,7 @@ local oldCameraSubject
 local viewDeathConnection
 
 local function trim(value)
-	return value:match('^%s*(.-)%s*$')
+	return (value or ''):match('^%s*(.-)%s*$')
 end
 
 local function clearViewDeathConnection()
@@ -41,8 +41,10 @@ local function findPlayer(prefix)
 	for _, entity in entitylib.List do
 		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
 			local player = entity.Player or entity
+			local username = player and player.Name
 			local displayName = player and player.DisplayName
-			if displayName and displayName:lower():sub(1, #lowered) == lowered then
+			if username and username:lower():sub(1, #lowered) == lowered
+				or displayName and displayName:lower():sub(1, #lowered) == lowered then
 				return entity
 			end
 		end
@@ -92,7 +94,9 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 		if callback then
 			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
-				local loweredMessage = message:lower()
+				local loweredMessage = message:lower():match('^%s*(.-)%s*$')
+				local command, prefix = message:match('^%.(%S+)%s*(.*)$')
+				local loweredCommand = command and command:lower()
 
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
 				if cChangeTeam.Enabled and teamCommand then
@@ -142,8 +146,6 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					return
 				end
 
-				local command, prefix = message:match('^%.(%S+)%s*(.*)$')
-				local loweredCommand = command and command:lower()
 				if loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
 					handleWhitelistCommand(loweredCommand, trim(prefix))
 					return
