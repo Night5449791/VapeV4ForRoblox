@@ -236,11 +236,6 @@ end
 local hash = loadstring(downloadFile('newvape/libraries/hash.lua'), 'hash')()
 local prediction = loadstring(downloadFile('newvape/libraries/prediction.lua'), 'prediction')()
 entitylib = loadstring(downloadFile('newvape/libraries/entity.lua'), 'entitylibrary')()
-local cheaters = loadstring(downloadFile('newvape/libraries/cheaters.lua'), 'cheaters')()
-if type(cheaters) ~= 'table' then
-	cheaters = {}
-end
-
 local whitelist = {
 	alreadychecked = {},
 	customtags = {},
@@ -260,7 +255,6 @@ vape.Libraries.entity = entitylib
 vape.Libraries.whitelist = whitelist
 vape.Libraries.prediction = prediction
 vape.Libraries.hash = hash
-vape.Libraries.cheaters = cheaters
 vape.Libraries.auraanims = {
 	Normal = {
 		{CFrame = CFrame.new(-0.17, -0.14, -0.12) * CFrame.Angles(math.rad(-53), math.rad(50), math.rad(-64)), Time = 0.1},
