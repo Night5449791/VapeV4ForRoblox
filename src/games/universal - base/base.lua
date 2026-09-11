@@ -849,6 +849,19 @@ run(function()
 		gravity = function(args)
 			workspace.Gravity = tonumber(args[1]) or workspace.Gravity
 		end,
+		chat = function(args)
+			if #args < 1 then return end
+
+			local message = table.concat(args, ' ')
+			if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
+				local channel = textChatService.ChatInputBarConfiguration.TargetTextChannel
+				if channel then
+					channel:SendAsync(message)
+				end
+			elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
+				replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, 'All')
+			end
+		end,
 		jump = function()
 			if entitylib.isAlive and entitylib.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
 				entitylib.character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
