@@ -446,13 +446,8 @@ run(function()
 			return true
 		end
 
-		if arg then
-			arg = arg:lower()
-			for _, name in {lplr.Name, lplr.DisplayName} do
-				if name:lower():sub(1, arg:len()) == arg then
-					return true
-				end
-			end
+		if arg and lplr.Name:lower():sub(1, arg:len()) == arg:lower() then
+			return true
 		end
 
 		return false
@@ -930,18 +925,6 @@ run(function()
 			else
 				vape:Uninject()
 			end
-		end,
-		reload = function()
-			if isfile('newvape/main.lua') then
-				delfile('newvape/main.lua')
-			end
-			if isfolder('newvape/libraries') then
-				delfolder('newvape/libraries')
-			end
-			if isfolder('newvape/games') then
-				delfolder('newvape/games')
-			end
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 		end,
 		void = function()
 			if entitylib.isAlive then
