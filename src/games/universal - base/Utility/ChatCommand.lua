@@ -101,16 +101,14 @@ local function resolveSkidTarget(args)
 	local bestLength = 0
 
 	for _, entity in entitylib.List do
-		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
-			local player = entity.Player or entity
-			local displayName = player and player.DisplayName
-			local loweredDisplayName = displayName and displayName:lower()
-			if loweredDisplayName and loweredArgs:sub(1, #loweredDisplayName) == loweredDisplayName
-				and (#loweredArgs == #loweredDisplayName or loweredArgs:sub(#loweredDisplayName + 1, #loweredDisplayName + 1) == ' ')
-				and #loweredDisplayName > bestLength then
-				bestPlayer = player
-				bestLength = #loweredDisplayName
-			end
+		local player = entity and entity.Player
+		local displayName = player and player.DisplayName
+		local loweredDisplayName = displayName and displayName:lower()
+		if loweredDisplayName and loweredArgs:sub(1, #loweredDisplayName) == loweredDisplayName
+			and (#loweredArgs == #loweredDisplayName or loweredArgs:sub(#loweredDisplayName + 1, #loweredDisplayName + 1) == ' ')
+			and #loweredDisplayName > bestLength then
+			bestPlayer = player
+			bestLength = #loweredDisplayName
 		end
 	end
 
