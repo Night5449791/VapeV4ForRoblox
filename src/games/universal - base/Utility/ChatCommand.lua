@@ -100,11 +100,8 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					delfolder('newvape/games')
 					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 				elseif (loweredMessage == '.serverhop' or loweredMessage == '.hop') and cServerHop.Enabled then
-					notif('ServerHop', 'Searching for a new server...', 5)
 					serverHop(nil, 'Descending')
 				elseif (loweredMessage == '.rj' or loweredMessage == '.rejoin') and cRejoin.Enabled then
-					notif('Rejoin', 'Rejoining...', 5)
-
 					if playersService.NumPlayers > 1 then
 						teleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId)
 					else
