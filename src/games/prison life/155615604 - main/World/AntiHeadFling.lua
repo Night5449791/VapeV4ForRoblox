@@ -63,7 +63,7 @@ local function check()
 	end
 end
 
-AntiHeadFling = vape.Categories.Blatant:CreateModule({
+AntiHeadFling = vape.Categories.World:CreateModule({
 	Name = 'AntiHeadFling',
 	Function = function(callback)
 		if callback then

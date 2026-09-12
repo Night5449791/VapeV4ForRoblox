@@ -11,7 +11,7 @@ local function Modify(part)
 	end
 end
 
-AntiFling = vape.Categories.Blatant:CreateModule({
+AntiFling = vape.Categories.World:CreateModule({
 	Name = 'AntiFling',
 	Function = function(callback)
 		if callback then

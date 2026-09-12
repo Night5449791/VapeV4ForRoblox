@@ -1,7 +1,7 @@
 local AntiCarFling
 local CarContainer
 local CarContainerParent
-AntiCarFling = vape.Categories.Blatant:CreateModule({
+AntiCarFling = vape.Categories.World:CreateModule({
 	Name = 'AntiCarFling',
 	Function = function(callback)
 		if callback then
