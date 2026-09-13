@@ -22,7 +22,6 @@ local function trigger(part, speed)
 	local jobId = game.JobId
 	local alone = #playersService:GetPlayers() <= 1
 
-	AntiHeadFling:Toggle()
 	lplr:Kick(string.format('Kill fling: %s at %.1f studs/s. rejoining...', part.Name, speed))
 
 	task.spawn(function()
