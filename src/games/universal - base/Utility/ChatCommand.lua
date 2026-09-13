@@ -59,7 +59,8 @@ local whitelistCommands = {
 
 local targetCommands = {
 	target = true,
-	blacklist = true
+	blacklist = true,
+	untarget = true
 }
 
 ChatCommand = vape.Categories.Utility:CreateModule({
@@ -152,6 +153,14 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 							targets:ChangeValue(player.Name)
 						end
 						notif('Target', player.DisplayName..' has been blacklisted.', 5)
+						return
+					elseif loweredCommand == 'untarget' then
+						if isTargeted then
+							targets:ChangeValue(player.Name)
+							notif('Target', player.DisplayName..' has been untargeted.', 5)
+						else
+							notif('Target', player.DisplayName..' is not currently targeted.', 5, 'warning')
+						end
 						return
 					end
 
