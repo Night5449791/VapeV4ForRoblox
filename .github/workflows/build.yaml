@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - main
+      - inhaler
 
 env:
   NODE_VERSION: '24.15.0'
@@ -52,4 +52,4 @@ jobs:
         cd ./VapeCompiled
         git add .
         git commit -m "Updated Vape"
-        git push origin
+        git push origin inhaler
