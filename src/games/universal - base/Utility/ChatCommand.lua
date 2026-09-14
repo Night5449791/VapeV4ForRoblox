@@ -6,9 +6,11 @@ local cServerHop
 local cReloadVape
 local cChangeTeam
 local cWhitelist
-local oldCameraSubject
+local cFollow
 local viewDeathConnection
+local following, followThread
 local teamsService = game:GetService('Teams')
+local pathfindingService = game:GetService('PathfindingService')
 
 local function clearViewDeathConnection()
 	if viewDeathConnection then
@@ -26,7 +28,10 @@ local function restoreCamera()
 		gameCamera.CameraSubject = cameraSubject
 		gameCamera.CameraType = Enum.CameraType.Custom
 	end
-	oldCameraSubject = nil
+end
+
+local function trim(s)
+	return s and s:match('^%s*(.-)%s*$')
 end
 
 local function findPlayer(prefix, includeDead)
@@ -35,11 +40,12 @@ local function findPlayer(prefix, includeDead)
 	end
 
 	local lowered = prefix:lower()
+	local length = #lowered
 	for _, entity in entitylib.List do
 		if entity and entity.Humanoid and (includeDead or entity.Humanoid.Health > 0) then
 			local player = entity.Player or entity
 			local displayName = player and player.DisplayName
-			if displayName and displayName:lower():sub(1, #lowered) == lowered then
+			if displayName and displayName:lower():sub(1, length) == lowered then
 				return entity
 			end
 		end
@@ -48,18 +54,91 @@ local function findPlayer(prefix, includeDead)
 	return nil
 end
 
+local function stopFollow()
+	following = false
+	if followThread then
+		task.cancel(followThread)
+		followThread = nil
+	end
+	local character = lplr.Character
+	local humanoid = character and character:FindFirstChildOfClass('Humanoid')
+	local root = character and character:FindFirstChild('HumanoidRootPart')
+	if humanoid and root then
+		humanoid:MoveTo(root.Position)
+	end
+end
+
+local function startFollow(entity)
+	stopFollow()
+	following = true
+	local targetPlayer = entity.Player or entity
+	followThread = task.spawn(function()
+		local path = pathfindingService:CreatePath({
+			AgentRadius = 2,
+			AgentHeight = 5,
+			AgentCanStep = 2,
+			AgentWidth = 2,
+			CanWalk = true
+		})
+		while following do
+			local targetChar = targetPlayer.Character
+			local targetRoot = targetChar and targetChar:FindFirstChild('HumanoidRootPart')
+			local character = lplr.Character
+			local humanoid = character and character:FindFirstChildOfClass('Humanoid')
+			local root = character and character:FindFirstChild('HumanoidRootPart')
+			if not (targetRoot and humanoid and root and humanoid.Health > 0) then
+				break
+			end
+
+			if (root.Position - targetRoot.Position).Magnitude > 6 then
+				local suc = pcall(function()
+					path:ComputeAsync(root.Position, targetRoot.Position)
+				end)
+				if suc and path.Status == Enum.PathStatus.Success then
+					for _, waypoint in ipairs(path:GetWaypoints()) do
+						if not following then
+							break
+						end
+						if waypoint.Action == Enum.PathWaypointAction.Jump then
+							humanoid.Jump = true
+						end
+						humanoid:MoveTo(waypoint.Position)
+						local timeout = os.clock() + 3
+						repeat
+							task.wait(0.1)
+						until not following or not root.Parent or (waypoint.Position - root.Position).Magnitude <= 4 or os.clock() > timeout
+					end
+				else
+					humanoid:MoveTo(targetRoot.Position)
+				end
+			end
+
+			task.wait(0.25)
+		end
+
+		following = false
+		followThread = nil
+	end)
+end
+
 local whitelistCommands = {
-	 wl = true,
-	 whitelist = true,
-	 unwl = true,
-	 unwhitelist = true
+	wl = true,
+	whitelist = true,
+	unwl = true,
+	unwhitelist = true
+}
+
+local teamAliases = {
+	g = 'Guards',
+	guards = 'Guards',
+	i = 'Inmates',
+	inmates = 'Inmates'
 }
 
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
 	Function = function(callback)
 		if callback then
-			oldCameraSubject = gameCamera.CameraSubject
 			ChatCommand:Clean(lplr.Chatted:Connect(function(message)
 				if message:sub(1, 1) ~= '.' then
 					return
@@ -69,24 +148,19 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 				local command, prefix = message:match('^%.(%S+)%s+(.+)$')
 				local loweredCommand = command and command:lower()
 				local teamCommand = loweredMessage:match('^%.team%s+(%S+)$')
-				if cChangeTeam.Enabled and teamCommand then
-					local teamName = teamCommand == 'g' and 'Guards'
-						or teamCommand == 'i' and 'Inmates'
-						or teamCommand == 'guards' and 'Guards'
-						or teamCommand == 'inmates' and 'Inmates'
-					if teamName then
-						local remotes = replicatedStorage:FindFirstChild('Remotes')
-						local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
-						local neutral = teamsService:FindFirstChild('Neutral')
-						local targetTeam = teamsService:FindFirstChild(teamName)
-						if requestTeamChange and neutral and targetTeam then
-							if lplr.Team ~= neutral then
-								requestTeamChange:InvokeServer(neutral, 1)
-								task.wait(1)
-							end
-							requestTeamChange:InvokeServer(targetTeam, 1)
+				if cChangeTeam.EnablcChangeTeam.Enabled and loweredMessage:match('^%.team%s+(%S+)$')
+				local teamName = teamCommand and teamAliases[teamCommand]
+				if teamName then
+					local remotes = replicatedStorage:FindFirstChild('Remotes')
+					local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
+					local neutral = teamsService:FindFirstChild('Neutral')
+					local targetTeam = teamsService:FindFirstChild(teamName)
+					if requestTeamChange and neutral and targetTeam then
+						if lplr.Team ~= neutral then
+							requestTeamChange:InvokeServer(neutral, 1)
+							task.wait(1)
 						end
-					end
+						requestTeamChange:InvokeServer(targetTeam, 1)
 				elseif loweredMessage == '.reload' and cReloadVape.Enabled then
 					delfile('newvape/main.lua')
 					delfolder('newvape/libraries')
@@ -102,10 +176,11 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					end
 				elseif loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
 					local isUnwhitelist = loweredCommand == 'unwl' or loweredCommand == 'unwhitelist'
-					local target = findPlayer(prefix:match('^%s*(.-)%s*$'), true)
+					local name = trim(prefix)
+					local target = findPlayer(name, true)
 					local player = target and target.Player
 					if not player and isUnwhitelist then
-						player = playersService:FindFirstChild(prefix)
+						player = playersService:FindFirstChild(name)
 					end
 					if not player then
 						notif('Whitelist', 'No player found.', 5, 'warning')
@@ -128,9 +203,23 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					notif('Whitelist', player.DisplayName..' has been whitelisted.', 5)
 				elseif loweredMessage == '.unview' then
 					restoreCamera()
+				elseif loweredMessage == '.unfollow' then
+					if following then
+						stopFollow()
+						notif('ChatCommand', 'Stopped following.', 5)
+					end
+				elseif loweredCommand == 'follow' and cFollow.Enabled then
+					local target = findPlayer(trim(prefix))
+					if not target or not target.RootPart then
+						notif('ChatCommand', 'No living player found.', 5, 'warning')
+						return
+					end
+
+					startFollow(target)
+					local player = target.Player or target
+					notif('ChatCommand', 'Now following '..player.DisplayName..'.', 5)
 				elseif loweredCommand == 'tp' and cPlayerTP.Enabled then
-					prefix = prefix:match('^%s*(.-)%s*$')
-					local target = findPlayer(prefix)
+					local target = findPlayer(trim(prefix))
 					if not target or not target.RootPart then
 						notif('ChatCommand', 'No living player found.', 5, 'warning')
 						return
@@ -139,9 +228,8 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					if entitylib.character and entitylib.character.RootPart then
 						entitylib.character.RootPart.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
 					end
-				elseif loweredCommand == 'view' and cPlayerView.Enabled and prefix then
-					prefix = prefix:match('^%s*(.-)%s*$')
-					local target = findPlayer(prefix)
+				elseif loweredCommand == 'view' and cPlayerView.Enabled then
+					local target = findPlayer(trim(prefix))
 					if not target then
 						notif('ChatCommand', 'No living player found.', 5, 'warning')
 						return
@@ -150,21 +238,13 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					if target.Humanoid then
 						clearViewDeathConnection()
 						gameCamera.CameraSubject = target.Humanoid
-						viewDeathConnection = target.Humanoid.Died:Connect(function()
-							viewDeathConnection = nil
-							local character = lplr.Character
-							local localHumanoid = character and character:FindFirstChildOfClass('Humanoid')
-								or (entitylib.character and entitylib.character.Humanoid)
-							if localHumanoid then
-								gameCamera.CameraSubject = localHumanoid
-								gameCamera.CameraType = Enum.CameraType.Custom
-							end
-						end)
+						viewDeathConnection = target.Humanoid.Died:Connect(restoreCamera)
 						vape:Clean(viewDeathConnection)
 					end
 				end
 			end))
 		else
+			stopFollow()
 			restoreCamera()
 		end
 	end
@@ -179,9 +259,7 @@ cPlayerView = ChatCommand:CreateToggle({
 	Name = 'PlayerView',
 	Default = true,
 	Function = function(callback)
-		if callback then
-			oldCameraSubject = gameCamera.CameraSubject
-		else
+		if not callback then
 			restoreCamera()
 		end
 	end
@@ -210,4 +288,14 @@ cChangeTeam = ChatCommand:CreateToggle({
 cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
 	Default = true
+})
+
+cFollow = ChatCommand:CreateToggle({
+	Name = 'Follow',
+	Default = true,
+	Function = function(callback)
+		if not callback then
+			stopFollow()
+		end
+	end
 })
