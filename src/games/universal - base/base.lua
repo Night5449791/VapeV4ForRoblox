@@ -425,7 +425,7 @@ run(function()
 	end
 
 	function whitelist:getplayer(arg, plr)
-		if arg == 'default' and self.localprio < 1 then
+		if arg == 'default' and self.localprio == 0 then
 			return true
 		end
 
