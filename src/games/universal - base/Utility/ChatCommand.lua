@@ -30,14 +30,14 @@ local function restoreCamera()
 	oldCameraSubject = nil
 end
 
-local function findPlayer(prefix)
+local function findPlayer(prefix, includeDead)
 	if not prefix or prefix == '' then
 		return nil
 	end
 
 	local lowered = prefix:lower()
 	for _, entity in entitylib.List do
-		if entity and entity.Humanoid and entity.Humanoid.Health > 0 then
+		if entity and entity.Humanoid and (includeDead or entity.Humanoid.Health > 0) then
 			local player = entity.Player or entity
 			local displayName = player and player.DisplayName
 			if displayName and displayName:lower():sub(1, #lowered) == lowered then
@@ -103,13 +103,13 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					end
 				elseif loweredCommand and whitelistCommands[loweredCommand] and cWhitelist.Enabled then
 					local isUnwhitelist = loweredCommand == 'unwl' or loweredCommand == 'unwhitelist'
-					local target = findPlayer(prefix:match('^%s*(.-)%s*$'))
+					local target = findPlayer(prefix:match('^%s*(.-)%s*$'), true)
 					local player = target and target.Player
 					if not player and isUnwhitelist then
 						player = playersService:FindFirstChild(prefix)
 					end
 					if not player then
-						notif('Whitelist', 'No living player found.', 5, 'warning')
+						notif('Whitelist', 'No player found.', 5, 'warning')
 						return
 					end
 
