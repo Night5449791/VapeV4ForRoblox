@@ -52,4 +52,4 @@ jobs:
         cd ./VapeCompiled
         git add .
         git commit -m "Updated Vape"
-        git push origin inhaler
+        git push origin:inhaler
