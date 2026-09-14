@@ -8,7 +8,6 @@ local cChangeTeam
 local cWhitelist
 local oldCameraSubject
 local viewDeathConnection
-local replicatedStorage = game:GetService('ReplicatedStorage')
 local teamsService = game:GetService('Teams')
 
 local function clearViewDeathConnection()
