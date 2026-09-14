@@ -50,6 +50,7 @@ jobs:
     - name: Push commit
       run: |-
         cd ./VapeCompiled
+        git checkout -b inhaler
         git add .
         git commit -m "Updated Inhaler"
         git push origin inhaler 
