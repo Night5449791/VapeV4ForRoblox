@@ -9,7 +9,7 @@ local isfile = isfile or function(file)
 end
 local function downloadFile(path, func)
 	if not isfile(path) then
-		local suc, res = pcall(function() return game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true) end)
+		local suc, res = pcall(function() return game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true) end)
 		if not suc or res == '404: Not Found' then error(res) end
 		if path:find('.lua') then res = '--This watermark is used to delete the file if its cached, remove it to make the file persist after vape updates.\n'..res end
 		writefile(path, res)
@@ -504,6 +504,28 @@ run(function()
 		end
 
 		return false
+	end
+
+	local oldstart = entitylib.start
+	local function customEntity(ent)
+		local plr = playersService:GetPlayerFromCharacter(ent.Parent)
+		if not plr then
+			entitylib.addEntity(ent.Parent)
+		end
+	end
+
+	entitylib.start = function()
+		oldstart()
+		if entitylib.Running then
+			for _, ent in collectionService:GetTagged('Humanoid') do
+				customEntity(ent)
+			end
+
+			table.insert(entitylib.Connections, collectionService:GetInstanceAddedSignal('Humanoid'):Connect(customEntity))
+			table.insert(entitylib.Connections, collectionService:GetInstanceRemovedSignal('Humanoid'):Connect(function(ent)
+				entitylib.removeEntity(ent.Parent)
+			end))
+		end
 	end
 end)
 entitylib.start()

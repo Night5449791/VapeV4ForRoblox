@@ -14,7 +14,7 @@ end
 local function downloadFile(path, func)
 	if not isfile(path) then
 		local suc, res = pcall(function()
-			return game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true)
+			return game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/VapeCompiled/'..readfile('newvape/profiles/commit.txt')..'/'..select(1, path:gsub('newvape/', '')), true)
 		end)
 		if not suc or res == '404: Not Found' then
 			error(res)
@@ -146,17 +146,8 @@ local function removeTags(str)
 	return (str:gsub('<[^<>]->', ''))
 end
 
-local function rakNetCheck(module)
-	if not (raknet and raknet.add_send_hook and pcall(raknet.add_send_hook, function() end)) then
-		notif(module, 'This feature requires raknet! (risky feature, please do not use on mains.)', 10, 'warning')
-		return false
-	end
-
-	return true
-end
-
 local visited, attempted, tpSwitch = {}, {}, false
-local cacheExpire, cache = tick()
+local cacheExpire, cache = os.clock()
 local function serverHop(pointer, filter)
 	visited = shared.vapeserverhoplist and shared.vapeserverhoplist:split('/') or {}
 	if not table.find(visited, game.JobId) then
@@ -168,14 +159,14 @@ local function serverHop(pointer, filter)
 	end
 
 	local success, httpdata = pcall(function()
-		return cacheExpire < tick() and game:HttpGet('https://games.roblox.com/v1/games/'..game.PlaceId..'/servers/Public?sortOrder='..(filter == 'Ascending' and 1 or 2)..'&excludeFullGames=true&limit=100'..(pointer and '&cursor='..pointer or '')) or cache
+		return cacheExpire < os.clock() and game:HttpGet('https://games.roblox.com/v1/games/'..game.PlaceId..'/servers/Public?sortOrder='..(filter == 'Ascending' and 1 or 2)..'&excludeFullGames=true&limit=100'..(pointer and '&cursor='..pointer or '')) or cache
 	end)
 
 	local data = success and httpService:JSONDecode(httpdata) or nil
 	if data and data.data then
 		for _, v in data.data do
 			if tonumber(v.playing) < playersService.MaxPlayers and not table.find(visited, v.id) and not table.find(attempted, v.id) then
-				cacheExpire, cache = tick() + 60, httpdata
+				cacheExpire, cache = os.clock() + 60, httpdata
 				table.insert(attempted, v.id)
 
 				notif('Vape', 'Found! Teleporting.', 5)
@@ -446,13 +437,8 @@ run(function()
 			return true
 		end
 
-		if arg then
-			arg = arg:lower()
-			for _, name in {lplr.Name, lplr.DisplayName} do
-				if name:lower():sub(1, arg:len()) == arg then
-					return true
-				end
-			end
+		if arg and lplr.Name:lower():sub(1, arg:len()) == arg:lower() then
+			return true
 		end
 
 		return false
@@ -752,12 +738,12 @@ run(function()
 	function whitelist:update(first)
 		local suc = pcall(function()
 			local _, subbed = pcall(function()
-				return game:HttpGet('https://github.com/Night5449791/whitelists')
+				return game:HttpGet('https://github.com/7GrandDadPGN/whitelists')
 			end)
 			local commit = subbed:find('currentOid')
 			commit = commit and subbed:sub(commit + 13, commit + 52) or nil
 			commit = commit and #commit == 40 and commit or 'main'
-			whitelist.textdata = game:HttpGet('https://raw.githubusercontent.com/Night5449791/whitelists/'..commit..'/PlayerWhitelist.json', true)
+			whitelist.textdata = game:HttpGet('https://raw.githubusercontent.com/7GrandDadPGN/whitelists/'..commit..'/PlayerWhitelist.json', true)
 		end)
 		if not suc or not hash or not whitelist.get then return true end
 		whitelist.loaded = true
@@ -930,18 +916,6 @@ run(function()
 			else
 				vape:Uninject()
 			end
-		end,
-		reload = function()
-			if isfile('newvape/main.lua') then
-				delfile('newvape/main.lua')
-			end
-			if isfolder('newvape/libraries') then
-				delfolder('newvape/libraries')
-			end
-			if isfolder('newvape/games') then
-				delfolder('newvape/games')
-			end
-			loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 		end,
 		void = function()
 			if entitylib.isAlive then

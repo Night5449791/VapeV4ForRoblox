@@ -199,7 +199,7 @@ run(function()
 	end
 end)
 
-local Cheats = {Flags = {}, Flagged = {}, FlaggedInfo = {}}
+local Cheats = {Flags = {}, Flagged = {}}
 run(function()
 	function Cheats:Flag(plr, flagType, limit)
 		if self.Flagged[plr.UserId] then
@@ -215,7 +215,6 @@ run(function()
 
 		if flags[flagType] > limit then
 			self.Flagged[plr.UserId] = true
-			self.FlaggedInfo[plr.UserId] = flagType
 			vapeEvents.CheatFlagged:Fire(plr, flagType)
 		end
 	end
@@ -223,7 +222,6 @@ run(function()
 	function Cheats:Clear()
 		table.clear(self.Flags)
 		table.clear(self.Flagged)
-		table.clear(self.FlaggedInfo)
 	end
 end)
 
@@ -470,9 +468,7 @@ run(function()
 		local text = ''
 		for _, plr in playersService:GetPlayers() do
 			if Cheats.Flagged[plr.UserId] then
-				local label = plr.DisplayName ~= plr.Name and plr.DisplayName or plr.Name
-				local flag = Cheats.FlaggedInfo[plr.UserId] or 'unknown'
-				text = text..'\n'..label..' ('..flag..')'
+				text = text..'\n'..(plr.DisplayName ~= plr.Name and plr.DisplayName..' ('..plr.Name..')' or plr.Name)
 			end
 		end
 
