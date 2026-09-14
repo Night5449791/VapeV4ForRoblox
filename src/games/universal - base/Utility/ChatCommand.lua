@@ -59,8 +59,10 @@ local whitelistCommands = {
 
 local targetCommands = {
 	target = true,
-	blacklist = true,
-	untarget = true
+	untarget = true,
+	-- idk why lol just pure fun
+	addskid = true,
+	delskid = true
 }
 
 ChatCommand = vape.Categories.Utility:CreateModule({
