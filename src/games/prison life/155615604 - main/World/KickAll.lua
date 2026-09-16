@@ -7,27 +7,9 @@ local tempList = setmetatable({}, {
 	__mode = 'k'
 })
 
-local whitelistCache = setmetatable({}, {
-	__mode = 'k'
-})
-
-local function isWhitelisted(plr)
-	if not plr then return false end
-	local time = os.clock()
-	local cache = whitelistCache[plr]
-	if cache and cache[2] > time then
-		return cache[1]
-	end
-
-	local result = whitelist:get(plr) ~= 0
-	whitelistCache[plr] = {result, time + 1}
-	return result
-end
-
 local function getTarget(seat)
-	local cached = tempList[seat]
-	if cached and cached.Health > 0 and not cached.Humanoid.Sit and not isWhitelisted(cached.Player) then
-		return cached
+	if tempList[seat] and tempList[seat].Health > 0 and not tempList[seat].Humanoid.Sit then
+		return tempList[seat]
 	end
 
 	if entitylib.isAlive then
@@ -37,7 +19,7 @@ local function getTarget(seat)
 		end)
 
 		for _, entity in cloned do
-			if entity.NPC or isWhitelisted(entity.Player) then continue end
+			if not select(2, whitelist:get(entity.Player)) then continue end
 			if entity.Player.Team == teams.Neutral then continue end
 			if not (entity.Humanoid.Sit and entity.Humanoid.SeatPart.Anchored) and entity.Humanoid.Health > 0 and (os.clock() - entity.SpawnTime) > 5 then
 				lastFling[entity.Player.Name] = os.clock()
