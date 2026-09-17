@@ -206,11 +206,13 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 
 cPlayerTP = ChatCommand:CreateToggle({
 	Name = 'PlayerTP',
+	Tooltip = '.tp <plr>',
 	Default = true,
 })
 
 cPlayerView = ChatCommand:CreateToggle({
 	Name = 'PlayerView',
+	Tooltip = '.view <plr>\n.unview',
 	Default = true,
 	Function = function(callback)
 		if callback then
@@ -223,30 +225,36 @@ cPlayerView = ChatCommand:CreateToggle({
 
 cRejoin = ChatCommand:CreateToggle({
 	Name = 'Rejoin',
+	Tooltip = '.rj\n.rejoin',
 	Default = true
 })
 
 cServerHop = ChatCommand:CreateToggle({
 	Name = 'ServerHop',
+	Tooltip = '.hop\n.serverhop',
 	Default = true
 })
 
 cReloadVape = ChatCommand:CreateToggle({
 	Name = 'ReloadVape',
+	Tooltip = '.reload',
 	Default = true
 })
 
 cChangeTeam = ChatCommand:CreateToggle({
 	Name = 'ChangeTeam',
+	Tooltip = '.team <g/i>',
 	Default = true
 })
 
 cWhitelist = ChatCommand:CreateToggle({
 	Name = 'Whitelist',
+	Tooltip = '.wl/.whitelist <plr>\n.unwl/.unwhitelist <plr>',
 	Default = true
 })
 
 cBlacklist = ChatCommand:CreateToggle({
 	Name = 'Blacklist',
+	Tooltip = '.target/.blacklist <plr>\n.untarget/.unblacklist <plr>',
 	Default = true
 })
