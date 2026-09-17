@@ -83,17 +83,45 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 						or teamCommand == 'guards' and 'Guards'
 						or teamCommand == 'inmates' and 'Inmates'
 					if teamName then
-						local remotes = replicatedStorage:FindFirstChild('Remotes')
-						local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
-						local neutral = teamsService:FindFirstChild('Neutral')
-						local targetTeam = teamsService:FindFirstChild(teamName)
-						if requestTeamChange and neutral and targetTeam then
+						task.spawn(function()
+							local remotes = replicatedStorage:FindFirstChild('Remotes')
+							local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
+							local neutral = teamsService:FindFirstChild('Neutral')
+							local targetTeam = teamsService:FindFirstChild(teamName)
+							if not targetTeam then return end
+
 							if lplr.Team ~= neutral then
-								requestTeamChange:InvokeServer(neutral, 1)
-								task.wait(1)
+								if requestTeamChange and neutral then
+									requestTeamChange:InvokeServer(neutral, 1)
+								end
+								task.wait(1.5)
 							end
-							requestTeamChange:InvokeServer(targetTeam, 1)
-						end
+
+							local clicked
+							local gui = lplr.PlayerGui:FindFirstChild('TeamsFrame', true)
+							if gui then
+								for _, holder in gui:GetChildren() do
+									local button = holder:FindFirstChild('Button')
+									if button and button.AutoButtonColor then
+										local text = (holder.Name..' '..button.Text):lower()
+										for _, label in holder:GetDescendants() do
+											if label:IsA('TextLabel') or label:IsA('TextButton') then
+												text = text..' '..label.Text:lower()
+											end
+										end
+										if text:find(teamName:lower(), 1, true) then
+											firesignal(button.MouseButton1Click)
+											clicked = true
+											break
+										end
+									end
+								end
+							end
+
+							if not clicked and requestTeamChange then
+								requestTeamChange:InvokeServer(targetTeam, 1)
+							end
+						end)
 					end
 				elseif loweredMessage == '.reload' and cReloadVape.Enabled then
 					delfile('newvape/main.lua')
