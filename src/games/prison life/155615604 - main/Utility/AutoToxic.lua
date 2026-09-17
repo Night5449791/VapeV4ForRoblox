@@ -17,7 +17,7 @@ local function sendMessage(name, obj)
 	if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
 		if textChatService:CanUserChatAsync(lplr.UserId) then
 			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendAsync(message)
-			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendPresetAsync(Presets['Good luck'])
+			textChatService.ChatInputBarConfiguration.TargetTextChannel:SendPresetAsync(Presets['So close'])
 		end
 	else
 		replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, 'All')
