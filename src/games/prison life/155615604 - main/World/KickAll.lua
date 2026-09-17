@@ -8,12 +8,18 @@ local tempList = setmetatable({}, {
 })
 
 local function getTarget(seat)
-	if tempList[seat] and tempList[seat].Health > 0 and not tempList[seat].Humanoid.Sit then
-		return tempList[seat]
+	local cached = tempList[seat]
+	if cached and cached.Character and cached.Character.Parent and cached.Humanoid.Health > 0 and not cached.Humanoid.Sit then
+		return cached
 	end
 
 	if entitylib.isAlive then
-		local cloned = table.clone(entitylib.List)
+		local cloned = {}
+		for _, entity in entitylib.List do
+			if entity.Player then
+				table.insert(cloned, entity)
+			end
+		end
 		table.sort(cloned, function(a, b)
 			return (lastFling[a.Player.Name] or 0) < (lastFling[b.Player.Name] or 0)
 		end)
@@ -21,7 +27,9 @@ local function getTarget(seat)
 		for _, entity in cloned do
 			if not select(2, whitelist:get(entity.Player)) then continue end
 			if entity.Player.Team == teams.Neutral then continue end
-			if not (entity.Humanoid.Sit and entity.Humanoid.SeatPart.Anchored) and entity.Humanoid.Health > 0 and (os.clock() - entity.SpawnTime) > 5 then
+			if entity.Character:FindFirstChildWhichIsA('ForceField') then continue end
+			local seatPart = entity.Humanoid.SeatPart
+			if not (entity.Humanoid.Sit and seatPart and seatPart.Anchored) and entity.Humanoid.Health > 0 and (os.clock() - entity.SpawnTime) > 5 then
 				lastFling[entity.Player.Name] = os.clock()
 				tempList[seat] = entity
 				table.clear(cloned)
