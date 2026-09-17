@@ -15,11 +15,10 @@ local function getTarget(seat)
 	if entitylib.isAlive then
 		local cloned = table.clone(entitylib.List)
 		table.sort(cloned, function(a, b)
-			return (lastFling[a.Player and a.Player.Name or ''] or 0) < (lastFling[b.Player and b.Player.Name or ''] or 0)
+			return (lastFling[a.Player.Name] or 0) < (lastFling[b.Player.Name] or 0)
 		end)
 
 		for _, entity in cloned do
-			if not entity.Player then continue end
 			if not select(2, whitelist:get(entity.Player)) then continue end
 			if entity.Player.Team == teams.Neutral then continue end
 			if not (entity.Humanoid.Sit and entity.Humanoid.SeatPart.Anchored) and entity.Humanoid.Health > 0 and (os.clock() - entity.SpawnTime) > 5 then
