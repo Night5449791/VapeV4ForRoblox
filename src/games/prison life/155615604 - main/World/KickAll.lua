@@ -109,7 +109,7 @@ KickAll = vape.Categories.World:CreateModule({
 					end
 
 					if Movement.Enabled then
-						root.CFrame = CFrame.new(Vector3.new(610 + dir, 100, 2494))
+						root.CFrame = CFrame.new(Vector3.new(610 + dir, 97, 2494))
 						root.AssemblyLinearVelocity = Vector3.zero
 					end
 
