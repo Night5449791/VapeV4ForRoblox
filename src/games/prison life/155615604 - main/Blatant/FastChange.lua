@@ -2,6 +2,13 @@ local FastChange
 local ChooseTeam
 local teamsService = game:GetService('Teams')
 
+local function hasConnections(signal)
+	for _, v in getconnections(signal) do
+		if v.Function then return true end
+	end
+	return false
+end
+
 local function clickTeamButton(name)
 	local gui = lplr.PlayerGui:FindFirstChild('TeamsFrame', true)
 	if gui then
@@ -15,7 +22,11 @@ local function clickTeamButton(name)
 					end
 				end
 				if text:find(name:lower(), 1, true) then
-					firesignal(button.MouseButton1Click)
+					for _, signal in {button.Activated, button.MouseButton1Click, button.MouseButton1Down, button.MouseButton1Up} do
+						if hasConnections(signal) then
+							firesignal(signal)
+						end
+					end
 					return true
 				end
 			end
