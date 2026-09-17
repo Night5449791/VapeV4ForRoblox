@@ -1,11 +1,11 @@
 local AutoToxic
-local Toggles, Lists, Cloned, Presets = {}, {}, {}, {}
+local Toggles, Lists, Cloned, Presets = {}, {Kicked = {}}, {Kicked = {}}, {}
 
 local function sendMessage(name, obj, default)
 	local message = default
-	if #Lists[name].ListEnabled > 0 then
+	if #Lists[name] > 0 then
 		if #Cloned[name] <= 0 then
-			Cloned[name] = table.clone(Lists[name].ListEnabled)
+			Cloned[name] = table.clone(Lists[name])
 		end
 
 		local entry = Random.new():NextInteger(1, #Cloned[name])
@@ -33,37 +33,33 @@ AutoToxic = vape.Categories.Utility:CreateModule({
     Function = function(callback)
         if callback then
             AutoToxic:Clean(vapeEvents.CheaterKicked.Event:Connect(function(plr)
-                    sendMessage('Kicked', plr, 'kicked <obj>| skill issue')
+                    sendMessage('Kicked', plr, lines.Kicked[Random.new():NextInteger(1, #lines.Kicked)])
             end))
         end
     end,
     Tooltip = 'Says a message after a cheater gets kicked with CheatDetector enabled.'
 })
-for _, v in {'Kicked'} do
-	Cloned[v] = {}
-	Toggles[v] = AutoToxic:CreateToggle({
-		Name = v..' ',
-		Function = function(callback)
-			if Lists[v] then
-				Lists[v].Object.Visible = callback
-			end
-		end,
-		Default = true
-	})
-	Lists[v] = AutoToxic:CreateTextList({
-		Name = v,
-		Darker = true,
-		Function = function()
-			table.clear(Cloned[v])
-		end
-	})
-end
+Toggles.Kicked = AutoToxic:CreateToggle({
+	Name = 'Kicked',
+	Default = true
+})
+
+local lines = {
+	Kicked = {
+		'hey anticheat kick me | kicked <obj>',
+		'gg freaking ez | kicked <obj>',
+		'prison life moment | kicked <obj>',
+		'i wonder why you got kicked | kicked <obj>',
+		'do you also want an antifling? | kicked <obj>',
+	}
+}
 
 pcall(function()
 	for _, group in textChatService:GetPresetsAsync().categoryGroups do
 		for _, category in group.categories do
 			for _, message in category.messages do
 				Presets[message.value] = message.presetId
+				table.insert(Lists.Kicked, message.value)
 			end
 		end
 	end
