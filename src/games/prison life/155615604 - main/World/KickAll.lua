@@ -21,9 +21,6 @@ local function getTarget(seat)
 			end
 		end
 		table.sort(cloned, function(a, b)
-			if a.Target ~= b.Target then
-				return a.Target
-			end
 			return (lastFling[a.Player.Name] or 0) < (lastFling[b.Player.Name] or 0)
 		end)
 
