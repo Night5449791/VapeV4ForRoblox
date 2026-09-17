@@ -26,8 +26,8 @@ local function getTarget(seat)
 
 		for _, entity in cloned do
 			if not select(2, whitelist:get(entity.Player)) then continue end
+			if isFriend(entity.Player) then continue end
 			if entity.Player.Team == teams.Neutral then continue end
-			if entity.Character:FindFirstChildWhichIsA('ForceField') then continue end
 			local seatPart = entity.Humanoid.SeatPart
 			if not (entity.Humanoid.Sit and seatPart and seatPart.Anchored) and entity.Humanoid.Health > 0 and (os.clock() - entity.SpawnTime) > 5 then
 				lastFling[entity.Player.Name] = os.clock()
