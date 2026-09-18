@@ -335,4 +335,4 @@ for _, toggle in toggles do
 		Default = true,
 		Function = toggle.Function
 	})
-endz
+end
