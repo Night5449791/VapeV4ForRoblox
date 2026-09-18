@@ -6,8 +6,6 @@ local lines = {
 		'prison life moment | kicked <obj>',
 		'i wonder why you got kicked | kicked <obj>',
 		'do you also want an antifling? | kicked <obj>',
-		'bro really thought he was getting away with it | kicked <obj>',
-		'anticheat finally caught up | kicked <obj>',
 	}
 }
 
@@ -30,9 +28,7 @@ AutoToxic = vape.Categories.Utility:CreateModule({
     Function = function(callback)
         if callback then
             AutoToxic:Clean(vapeEvents.CheaterKicked.Event:Connect(function(plr)
-                if Toggles.Kicked.Enabled then
-                    sendMessage('Kicked', plr)
-                end
+                sendMessage('Kicked', plr)
             end))
         end
     end,
