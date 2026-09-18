@@ -33,6 +33,7 @@ local textService = cloneref(game:GetService('TextService'))
 local guiService = cloneref(game:GetService('GuiService'))
 local runService = cloneref(game:GetService('RunService'))
 local httpService = cloneref(game:GetService('HttpService'))
+local playersService = cloneref(game:GetService('Players'))
 
 local fontsize = Instance.new('GetTextBoundsParams')
 fontsize.Width = math.huge
@@ -282,6 +283,16 @@ local function checkKeybinds(compare, target, key)
 	end
 
 	return false
+end
+
+local function getPlayerFromText(text)
+	if text ~= '' then
+		for _, plr in playersService:GetPlayers() do
+			if plr.Name:sub(1, #text):lower() == text:lower() then
+				return plr.Name
+			end
+		end
+	end
 end
 
 local function getTableSize(dict)
@@ -650,10 +661,13 @@ function vape:SortCategories()
 
 	for _, sort in sorting do
 		table.sort(sort)
-		for index, name in sort do
-			self.Modules[name].Index = index
+
+		local index = 2
+		for _, name in sort do
+			self.Modules[name].Index = index / 2
 			self.Modules[name].Object.LayoutOrder = index
-			self.Modules[name].Children.LayoutOrder = index
+			self.Modules[name].Children.LayoutOrder = index + 1
+			index += 2
 		end
 	end
 end
