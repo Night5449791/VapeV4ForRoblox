@@ -7,6 +7,7 @@ local cReloadVape
 local cChangeTeam
 local cWhitelist
 local cBlacklist
+local cKick
 local oldCameraSubject
 local viewDeathConnection
 local teamsService = game:GetService('Teams')
@@ -62,6 +63,11 @@ local blacklistCommands = {
 	 untarget = true,
 	 unblacklist = true
 }
+
+local function getKickTargetList()
+	local kickModule = vape.Modules.KickExploit
+	return kickModule and kickModule.Options and kickModule.Options['Targets']
+end
 
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
@@ -176,9 +182,13 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 
 					local targets = vape.Categories.Targets
 					local isBlacklisted = table.find(targets.ListEnabled, player.Name) ~= nil
+					local kickList = getKickTargetList()
 					if isUnblacklist then
 						if isBlacklisted then
 							targets:ChangeValue(player.Name)
+						end
+						if kickList and table.find(kickList.List, player.Name) then
+							kickList:ChangeValue(player.Name)
 						end
 						notif('Blacklist', player.DisplayName..' has been unblacklisted.', 5)
 						return
@@ -187,7 +197,58 @@ ChatCommand = vape.Categories.Utility:CreateModule({
 					if not isBlacklisted then
 						targets:ChangeValue(player.Name)
 					end
+					if kickList and not table.find(kickList.List, player.Name) then
+						kickList:ChangeValue(player.Name)
+					end
 					notif('Blacklist', player.DisplayName..' has been blacklisted.', 5)
+				elseif loweredCommand == 'kick' or loweredCommand == 'kickmethod' then
+					if not cKick.Enabled then
+						return
+					end
+
+					local kickModule = vape.Modules.KickExploit
+					if not kickModule then
+						notif('ChatCommand', 'KickExploit is not available in this game.', 5, 'warning')
+						return
+					end
+
+					local options = kickModule.Options
+					prefix = prefix:match('^%s*(.-)%s*$')
+					local name = (prefix:match('^target%s+(.+)$') or prefix):match('^%s*(.-)%s*$')
+
+					if name:lower() == 'all' then
+						options['Mode']:SetValue('All')
+						if not kickModule.Enabled then
+							kickModule:Toggle()
+						end
+						notif('KickExploit', 'Flinging all players.', 5)
+					else
+						if name == '' then
+							notif('KickExploit', 'Usage: .kick <plr> or .kick all', 5, 'warning')
+							return
+						end
+
+						local target = findPlayer(name, true)
+						local player = target and target.Player or playersService:FindFirstChild(name)
+						if not player then
+							notif('KickExploit', 'No player found.', 5, 'warning')
+							return
+						end
+
+						local list = options['Targets']
+						if not table.find(list.List, player.Name) then
+							list:ChangeValue(player.Name)
+						end
+						local targets = vape.Categories.Targets
+						if not table.find(targets.ListEnabled, player.Name) then
+							targets:ChangeValue(player.Name)
+						end
+						options['Mode']:SetValue('Individual')
+						if not kickModule.Enabled then
+							kickModule:Toggle()
+						end
+						notif('KickExploit', 'Flinging '..player.Name..'.', 5)
+					end
 				elseif loweredMessage == '.unview' then
 					restoreCamera()
 				elseif loweredCommand == 'tp' and cPlayerTP.Enabled then
@@ -284,5 +345,11 @@ cWhitelist = ChatCommand:CreateToggle({
 cBlacklist = ChatCommand:CreateToggle({
 	Name = 'Blacklist',
 	Tooltip = '.target/.blacklist <plr>\n.untarget/.unblacklist <plr>',
+	Default = true
+})
+
+cKick = ChatCommand:CreateToggle({
+	Name = 'Kick',
+	Tooltip = '.kick/.kickmethod <plr>\n.kick/.kickmethod all',
 	Default = true
 })
