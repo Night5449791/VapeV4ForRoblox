@@ -2,17 +2,11 @@ local ChatCommand
 
 local options = {}
 local viewConnection
-local followThread
+local followModule, followOldMove
 local followPlayer
+local followConnection
 local teamsService = cloneref(game:GetService('Teams'))
 local teleportService = cloneref(game:GetService('TeleportService'))
-local pathfindingService = cloneref(game:GetService('PathfindingService'))
-local pathParams = {
-	AgentRadius = 2,
-	AgentHeight = 5,
-	AgentCanJump = true,
-	AgentMaxSlope = 45
-}
 local teamAliases = {
 	g = 'Guards',
 	guards = 'Guards',
@@ -150,81 +144,71 @@ end
 
 -- Follow
 
-local function stopFollow()
-	if followThread then
-		task.cancel(followThread)
-		followThread = nil
-	end
+local function getFollowEntity()
+	if not followPlayer then return end
 
-	followPlayer = nil
+	local entity = entitylib.getEntity(followPlayer)
+	return entity and entity.Health > 0 and entity or nil
 end
 
-local function walkToWaypoint(humanoid, position)
-	humanoid:MoveTo(position)
+local function stopFollow()
+	followConnection = disconnect(followConnection)
 
-	local timeout = os.clock() + 4
-	repeat
-		if not followPlayer then return false end
+	if followModule and followOldMove then
+		followModule.moveFunction = followOldMove
+	end
 
-		local localRoot = entitylib.character and entitylib.character.RootPart
-		if not localRoot or humanoid.Health <= 0 then return false end
-		if (position - localRoot.Position).Magnitude < 4 then return true end
-
-		task.wait()
-	until os.clock() > timeout
-
-	return false
+	followModule, followOldMove = nil, nil
+	followPlayer = nil
 end
 
 local function startFollow(player)
 	stopFollow()
+
+	local module
+	if not pcall(function()
+		module = require(lplr.PlayerScripts.PlayerModule).controls
+	end) or not module or not module.moveFunction then
+		notif('ChatCommand', 'Follow is not supported in this game.', 5, 'warning')
+		return
+	end
+
 	followPlayer = player
+	followModule = module
+	followOldMove = module.moveFunction
 
-	followThread = task.spawn(function()
-		local path = pathfindingService:CreatePath(pathParams)
+	module.moveFunction = function(self, vec, face)
+		local humanoid = getLocalHumanoid()
+		if not humanoid or humanoid.Health <= 0 then
+			return followOldMove(self, vec, face)
+		end
 
-		while followPlayer do
-			local humanoid = getLocalHumanoid()
-			local localRoot = entitylib.character and entitylib.character.RootPart
-			local targetEntity = findEntity(followPlayer.Name)
-			local targetRoot = targetEntity and targetEntity.RootPart
-
-			if not humanoid or humanoid.Health <= 0 or not localRoot or not targetRoot then
-				break
+		local targetEntity = getFollowEntity()
+		local targetRoot = targetEntity and targetEntity.RootPart
+		local root = entitylib.character and entitylib.character.RootPart
+		if targetRoot and root then
+			local direction = (targetRoot.Position - root.Position) * Vector3.new(1, 0, 1)
+			if direction.Magnitude > 1 then
+				vec = direction.Unit
 			end
+		end
 
-			if humanoid.SeatPart then
-				humanoid.Sit = false
-			end
+		return followOldMove(self, vec, face)
+	end
 
-			local goal = targetRoot.Position
-			if (goal - localRoot.Position).Magnitude < 6 then
-				task.wait(0.15)
-				continue
-			end
+	followConnection = runService.PreSimulation:Connect(function()
+		local humanoid = getLocalHumanoid()
+		if not humanoid or humanoid.Health <= 0 then
+			stopFollow()
+			return
+		end
 
-			local computed = pcall(path.ComputeAsync, path, localRoot.Position, goal)
-			if not computed or path.Status ~= Enum.PathStatus.Success then
-				humanoid:MoveTo(goal)
-				task.wait(0.35)
-				continue
-			end
+		if humanoid.Sit then
+			humanoid.Sit = false
+		end
 
-			for _, waypoint in path:GetWaypoints() do
-				if not followPlayer then break end
-
-				local current = findEntity(followPlayer.Name)
-				if not current or not current.RootPart then break end
-
-				-- target moved, recompute instead of chasing a stale path
-				if (current.RootPart.Position - goal).Magnitude > 8 then break end
-
-				if waypoint.Action == Enum.PathWaypointAction.Jump then
-					humanoid.Jump = true
-				end
-
-				if not walkToWaypoint(humanoid, waypoint.Position) then break end
-			end
+		if not getFollowEntity() then
+			stopFollow()
 		end
 	end)
 end
