@@ -2,6 +2,8 @@ local ChatCommand
 
 local options = {}
 local viewConnection
+local followConnection
+local followPlayer
 local teamsService = cloneref(game:GetService('Teams'))
 local teleportService = cloneref(game:GetService('TeleportService'))
 local teamAliases = {
@@ -33,6 +35,14 @@ local function clearListValues(list)
 	return count
 end
 
+local function disconnect(connection)
+	if connection then
+		connection:Disconnect()
+	end
+
+	return nil
+end
+
 -- Camera
 
 local function getLocalHumanoid()
@@ -42,10 +52,7 @@ local function getLocalHumanoid()
 end
 
 local function clearViewConnection()
-	if viewConnection then
-		viewConnection:Disconnect()
-		viewConnection = nil
-	end
+	viewConnection = disconnect(viewConnection)
 end
 
 local function restoreCamera()
@@ -139,6 +146,36 @@ local function stopKick()
 	notif('KickExploit', 'Kick disabled.', 5)
 end
 
+-- Follow
+
+local function stopFollow()
+	followConnection = disconnect(followConnection)
+	followPlayer = nil
+end
+
+local function startFollow(player)
+	stopFollow()
+	followPlayer = player
+
+	followConnection = runService.Heartbeat:Connect(function()
+		local humanoid = getLocalHumanoid()
+		if not followPlayer or not humanoid or humanoid.Health <= 0 then
+			stopFollow()
+			return
+		end
+
+		local targetEntity = findEntity(followPlayer.Name)
+		local targetRoot = targetEntity and targetEntity.RootPart
+		if not targetRoot then return end
+
+		if humanoid.SeatPart then
+			humanoid.Sit = false
+		end
+
+		humanoid:MoveTo(targetRoot.Position)
+	end)
+end
+
 -- Team switching
 
 local function clickTeamButton(teamName)
@@ -173,7 +210,7 @@ local function handleTeam(args)
 	local teamName = command and teamAliases[command:lower()]
 	if not teamName then return end
 
-	task.spawn(function()
+	ChatCommand:Clean(task.spawn(function()
 		local remotes = replicatedStorage:FindFirstChild('Remotes')
 		local requestTeamChange = remotes and remotes:FindFirstChild('RequestTeamChange')
 		local neutral = teamsService:FindFirstChild('Neutral')
@@ -190,7 +227,7 @@ local function handleTeam(args)
 		if not clickTeamButton(teamName) and requestTeamChange then
 			requestTeamChange:InvokeServer(targetTeam, 1)
 		end
-	end)
+	end))
 end
 
 local function handleReload()
@@ -309,6 +346,24 @@ local function handleTP(args)
 	localRoot.CFrame = target.RootPart.CFrame + Vector3.new(0, 2, 0)
 end
 
+local function handleFollow(args)
+	if not options.PlayerFollow.Enabled then return end
+
+	local target = findEntity(args)
+	if not target or not target.Player then
+		notif('ChatCommand', 'No living player found.', 5, 'warning')
+		return
+	end
+
+	startFollow(target.Player)
+	notif('ChatCommand', 'Following '..target.Player.DisplayName..'.', 5)
+end
+
+local function handleUnfollow()
+	stopFollow()
+	notif('ChatCommand', 'Stopped following.', 5)
+end
+
 local function handleView(args)
 	if not options.PlayerView.Enabled then return end
 
@@ -352,6 +407,10 @@ local function onChatted(message)
 		handleKick(args)
 	elseif command == 'unview' then
 		restoreCamera()
+	elseif command == 'follow' then
+		handleFollow(args)
+	elseif command == 'unfollow' then
+		handleUnfollow()
 	elseif command == 'tp' then
 		handleTP(args)
 	elseif command == 'view' then
@@ -362,16 +421,21 @@ end
 ChatCommand = vape.Categories.Utility:CreateModule({
 	Name = 'ChatCommand',
 	Function = function(callback)
-		if callback then
-			ChatCommand:Clean(lplr.Chatted:Connect(onChatted))
-		else
-			restoreCamera()
-		end
+		if not callback then return end
+
+		ChatCommand:Clean(restoreCamera)
+		ChatCommand:Clean(stopFollow)
+		ChatCommand:Clean(lplr.Chatted:Connect(onChatted))
 	end
 })
 
 local toggles = {
 	{Name = 'PlayerTP', Tooltip = '.tp <plr>'},
+	{Name = 'PlayerFollow', Tooltip = '.follow <plr>\n.unfollow', Function = function(enabled)
+		if not enabled then
+			stopFollow()
+		end
+	end},
 	{Name = 'PlayerView', Tooltip = '.view <plr>\n.unview', Function = function(enabled)
 		if not enabled then
 			restoreCamera()
