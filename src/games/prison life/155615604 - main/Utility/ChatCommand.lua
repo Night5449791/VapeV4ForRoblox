@@ -436,7 +436,32 @@ local function handleKickTeam(args)
 	local command = trim(args)
 	if not command or command == '' then return end
 
-	local teamName = kickTeamAliases[command:lower()]
+	local lowered = command:lower()
+	if lowered == 'all' then
+		local names = {}
+		for _, teamName in kickTeamAliases do
+			local teamPlayers = getTeamPlayerNames(teamName)
+			if teamPlayers then
+				for _, name in teamPlayers do
+					if not table.find(names, name) then
+						table.insert(names, name)
+					end
+				end
+			end
+		end
+
+		if #names == 0 then
+			notif('KickExploit', 'No players found in any team.', 5, 'warning')
+			return
+		end
+
+		addListValues(vape.Categories.Targets, names)
+		addListValues(module.Options['Targets'], names)
+		startKick('Individual', 'Flinging '..#names..' players from all teams.')
+		return
+	end
+
+	local teamName = kickTeamAliases[lowered]
 	if not teamName then return end
 
 	local names = getTeamPlayerNames(teamName)
@@ -569,7 +594,7 @@ local toggles = {
 	{Name = 'ChangeTeam', Tooltip = '.team <g/i>'},
 	{Name = 'Whitelist', Tooltip = '.wl/.whitelist <plr>\n.unwl/.unwhitelist <plr>'},
 	{Name = 'Blacklist', Tooltip = '.target/.blacklist <plr>\n.untarget/.unblacklist <plr>\n.untarget all/.target all clears every target'},
-	{Name = 'Kick', Tooltip = '.kick <plr>\n.kick all\n.kick none\n.kickteam <criminals/guards/inmates>'}
+	{Name = 'Kick', Tooltip = '.kick <plr>\n.kick all\n.kick none\n.kickteam <criminals/guards/inmates>\n.kickteam all'}
 }
 
 for _, toggle in toggles do
