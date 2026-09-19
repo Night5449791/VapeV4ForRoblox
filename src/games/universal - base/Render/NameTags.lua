@@ -12,43 +12,10 @@ local FontOption
 local Teammates
 local DistanceCheck
 local DistanceLimit
-local Verified
 local Strings, Sizes, Reference = {}, {}, {}
-local VerifiedCache = setmetatable({}, {
-	__mode = 'k'
-})
 local Folder = Instance.new('Folder')
 Folder.Parent = vape.gui
 local methodused
-
-local function hasVerifiedBadge(player)
-	local cached = VerifiedCache[player]
-	if cached ~= nil then
-		return cached
-	end
-
-	local success, verified = pcall(function()
-		return player.HasVerifiedBadge
-	end)
-
-	verified = success and verified == true
-	VerifiedCache[player] = verified
-	return verified
-end
-
-local function getEntityName(ent, rich)
-	if not ent.Player then
-		return ent.Character.Name
-	end
-
-	local player = ent.Player
-	local name = DisplayName.Enabled and player.DisplayName or player.Name
-	if Verified.Enabled and hasVerifiedBadge(player) then
-		name = rich and '<font color="rgb(29, 161, 242)">✔</font> '..name or '✔ '..name
-	end
-
-	return whitelist:tag(player, true, rich)..name
-end
 
 local Added = {
 	Normal = function(ent)
@@ -59,7 +26,7 @@ local Added = {
 			setthreadidentity(8)
 		end
 
-		Strings[ent] = getEntityName(ent, true)
+		Strings[ent] = ent.Player and whitelist:tag(ent.Player, true, true)..(DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or ent.Character.Name
 
 		if Health.Enabled then
 			local healthColor = Color3.fromHSV(math.clamp(ent.Health / ent.MaxHealth, 0, 1) / 2.5, 0.89, 0.75)
@@ -103,7 +70,7 @@ local Added = {
 		nametag.Text.Size = 15 * Scale.Value
 		nametag.Text.Font = 0
 		nametag.Text.ZIndex = 2
-		Strings[ent] = getEntityName(ent, false)
+		Strings[ent] = ent.Player and whitelist:tag(ent.Player, true)..(DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or ent.Character.Name
 
 		if Health.Enabled then
 			Strings[ent] = Strings[ent]..' '..math.round(ent.Health)
@@ -160,7 +127,7 @@ local Updated = {
 				setthreadidentity(8)
 			end
 			Sizes[ent] = nil
-			Strings[ent] = getEntityName(ent, true)
+			Strings[ent] = ent.Player and whitelist:tag(ent.Player, true, true)..(DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or ent.Character.Name
 
 			if Health.Enabled then
 				local color = Color3.fromHSV(math.clamp(ent.Health / ent.MaxHealth, 0, 1) / 2.5, 0.89, 0.75)
@@ -183,7 +150,7 @@ local Updated = {
 				setthreadidentity(8)
 			end
 			Sizes[ent] = nil
-			Strings[ent] = getEntityName(ent, false)
+			Strings[ent] = ent.Player and whitelist:tag(ent.Player, true)..(DisplayName.Enabled and ent.Player.DisplayName or ent.Player.Name) or ent.Character.Name
 
 			if Health.Enabled then
 				Strings[ent] = Strings[ent]..' '..math.round(ent.Health)
@@ -320,8 +287,6 @@ NameTags = vape.Categories.Render:CreateModule({
 					Removed[methodused](i)
 				end
 			end
-
-			table.clear(VerifiedCache)
 		end
 	end,
 	Tooltip = 'Renders nametags on entities through walls.'
@@ -419,17 +384,6 @@ DisplayName = NameTags:CreateToggle({
 		end
 	end,
 	Default = true
-})
-Verified = NameTags:CreateToggle({
-	Name = 'Verified Badge',
-	Function = function()
-		if NameTags.Enabled then
-			NameTags:Toggle()
-			NameTags:Toggle()
-		end
-	end,
-	Default = true,
-	Tooltip = 'Shows a badge next to verified players'
 })
 Teammates = NameTags:CreateToggle({
 	Name = 'Priority Only',

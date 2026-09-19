@@ -114,11 +114,6 @@ end
 
 local function clearAllTargets()
 	local count = clearListValues(vape.Categories.Targets)
-	local module = kickModule()
-	if module then
-		clearListValues(module.Options['Targets'])
-	end
-
 	notif('Blacklist', count > 0 and 'Cleared '..count..' target'..(count == 1 and '.' or 's.') or 'No targets to clear.', 5)
 end
 
@@ -298,7 +293,6 @@ local function handleTargets(args, remove)
 	end
 
 	setListValue(vape.Categories.Targets, player.Name, not remove)
-	setKickTarget(player.Name, not remove)
 	notif('Blacklist', player.DisplayName..' has been '..(remove and 'unblacklisted.' or 'blacklisted.'), 5)
 end
 
