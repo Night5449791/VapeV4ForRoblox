@@ -440,11 +440,13 @@ local function handleKickTeam(args)
 	if lowered == 'all' then
 		local names = {}
 		for _, teamName in kickTeamAliases do
-			local teamPlayers = getTeamPlayerNames(teamName)
-			if teamPlayers then
-				for _, name in teamPlayers do
-					if not table.find(names, name) then
-						table.insert(names, name)
+			if teamName ~= 'Neutral' then
+				local teamPlayers = getTeamPlayerNames(teamName)
+				if teamPlayers then
+					for _, name in teamPlayers do
+						if not table.find(names, name) then
+							table.insert(names, name)
+						end
 					end
 				end
 			end
