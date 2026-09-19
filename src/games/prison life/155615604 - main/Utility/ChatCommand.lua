@@ -361,6 +361,7 @@ local function handleKick(args)
 	local player = findPlayer(name, true)
 	if not player then
 		notif('KickExploit', 'No player found.', 5, 'warning')
+		module.Options['Mode']:SetValue("All")
 		return
 	end
 
