@@ -2,9 +2,16 @@ local ChatCommand
 
 local options = {}
 local viewConnection
-local followConnection
+local followThread
 local followPlayer
 local teamsService = cloneref(game:GetService('Teams'))
+local pathfindingService = cloneref(game:GetService('PathfindingService'))
+local pathParams = {
+	AgentRadius = 2,
+	AgentHeight = 5,
+	AgentCanJump = true,
+	AgentMaxSlope = 45
+}
 local teamAliases = {
 	g = 'Guards',
 	guards = 'Guards',
@@ -106,30 +113,81 @@ end
 -- Follow
 
 local function stopFollow()
-	followConnection = disconnect(followConnection)
+	if followThread then
+		task.cancel(followThread)
+		followThread = nil
+	end
+
 	followPlayer = nil
+end
+
+local function walkToWaypoint(humanoid, position)
+	humanoid:MoveTo(position)
+
+	local timeout = os.clock() + 4
+	repeat
+		if not followPlayer then return false end
+
+		local localRoot = entitylib.character and entitylib.character.RootPart
+		if not localRoot or humanoid.Health <= 0 then return false end
+		if (position - localRoot.Position).Magnitude < 4 then return true end
+
+		task.wait()
+	until os.clock() > timeout
+
+	return false
 end
 
 local function startFollow(player)
 	stopFollow()
 	followPlayer = player
 
-	followConnection = runService.Heartbeat:Connect(function()
-		local humanoid = getLocalHumanoid()
-		if not followPlayer or not humanoid or humanoid.Health <= 0 then
-			stopFollow()
-			return
+	followThread = task.spawn(function()
+		local path = pathfindingService:CreatePath(pathParams)
+
+		while followPlayer do
+			local humanoid = getLocalHumanoid()
+			local localRoot = entitylib.character and entitylib.character.RootPart
+			local targetEntity = findEntity(followPlayer.Name)
+			local targetRoot = targetEntity and targetEntity.RootPart
+
+			if not humanoid or humanoid.Health <= 0 or not localRoot or not targetRoot then
+				break
+			end
+
+			if humanoid.SeatPart then
+				humanoid.Sit = false
+			end
+
+			local goal = targetRoot.Position
+			if (goal - localRoot.Position).Magnitude < 6 then
+				task.wait(0.15)
+				continue
+			end
+
+			local computed = pcall(path.ComputeAsync, path, localRoot.Position, goal)
+			if not computed or path.Status ~= Enum.PathStatus.Success then
+				humanoid:MoveTo(goal)
+				task.wait(0.35)
+				continue
+			end
+
+			for _, waypoint in path:GetWaypoints() do
+				if not followPlayer then break end
+
+				local current = findEntity(followPlayer.Name)
+				if not current or not current.RootPart then break end
+
+				-- target moved, recompute instead of chasing a stale path
+				if (current.RootPart.Position - goal).Magnitude > 8 then break end
+
+				if waypoint.Action == Enum.PathWaypointAction.Jump then
+					humanoid.Jump = true
+				end
+
+				if not walkToWaypoint(humanoid, waypoint.Position) then break end
+			end
 		end
-
-		local targetEntity = findEntity(followPlayer.Name)
-		local targetRoot = targetEntity and targetEntity.RootPart
-		if not targetRoot then return end
-
-		if humanoid.SeatPart then
-			humanoid.Sit = false
-		end
-
-		humanoid:MoveTo(targetRoot.Position)
 	end)
 end
 
