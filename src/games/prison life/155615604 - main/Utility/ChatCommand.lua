@@ -22,6 +22,10 @@ local kickTeamAliases = {
 	inmates = 'Inmates'
 }
 
+local function plural(count)
+	return count == 1 and '.' or 's.'
+end
+
 local function trim(text)
 	return text and text:match('^%s*(.-)%s*$') or nil
 end
@@ -139,7 +143,7 @@ end
 
 local function clearAllTargets()
 	local count = clearListValues(vape.Categories.Targets)
-	notif('Blacklist', count > 0 and 'Cleared '..count..' target'..(count == 1 and '.' or 's.') or 'No targets to clear.', 5)
+	notif('Blacklist', count > 0 and 'Cleared '..count..' target'..plural(count) or 'No targets to clear.', 5)
 end
 
 local function setKickEnabled(module, enabled)
@@ -309,6 +313,18 @@ local function handleReload()
 	loadstring(game:HttpGet('https://raw.githubusercontent.com/Night5449791/VapeV4ForRoblox/main/NewMainScript.lua', true))()
 end
 
+local function handleLoadProfile(args)
+	if not options.LoadProfile.Enabled then return end
+
+	local profile = trim(args)
+	if not profile or profile == '' then
+		notif('ChatCommand', 'Usage: .loadprofile <profile> or .lp <profile>', 5, 'warning')
+		return
+	end
+
+	vape:Load(true, profile)
+end
+
 local function handleHop()
 	if not options.ServerHop.Enabled then return end
 
@@ -365,7 +381,8 @@ end
 local function handleKick(args)
 	if not options.Kick.Enabled then return end
 
-	if not kickModule() then
+	local module = kickModule()
+	if not module then
 		notif('ChatCommand', 'KickExploit is not available in this game.', 5, 'warning')
 		return
 	end
@@ -410,7 +427,8 @@ end
 local function handleKickTeam(args)
 	if not options.Kick.Enabled then return end
 
-	if not kickModule() then
+	local module = kickModule()
+	if not module then
 		notif('ChatCommand', 'KickExploit is not available in this game.', 5, 'warning')
 		return
 	end
@@ -428,7 +446,7 @@ local function handleKickTeam(args)
 	end
 
 	addListValues(vape.Categories.Targets, names)
-	addListValues(kickModule().Options['Targets'], names)
+	addListValues(module.Options['Targets'], names)
 	startKick('Individual', 'Flinging '..#names..' '..teamName..'.')
 end
 
@@ -488,6 +506,8 @@ local function onChatted(message)
 
 	if command == 'team' then
 		handleTeam(args)
+	elseif command == 'loadprofile' or command == 'lp' then
+		handleLoadProfile(args)
 	elseif command == 'reload' then
 		handleReload()
 	elseif command == 'hop' or command == 'serverhop' then
@@ -544,6 +564,7 @@ local toggles = {
 	end},
 	{Name = 'Rejoin', Tooltip = '.rj\n.rejoin'},
 	{Name = 'ServerHop', Tooltip = '.hop\n.serverhop'},
+	{Name = 'LoadProfile', Tooltip = '.loadprofile <profile>\n.lp <profile>'},
 	{Name = 'ReloadVape', Tooltip = '.reload'},
 	{Name = 'ChangeTeam', Tooltip = '.team <g/i>'},
 	{Name = 'Whitelist', Tooltip = '.wl/.whitelist <plr>\n.unwl/.unwhitelist <plr>'},
