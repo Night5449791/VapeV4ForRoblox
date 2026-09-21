@@ -14,14 +14,6 @@ local function ApplyGrip(tool)
 	end
 end
 
-local function ResetGrip(tool)
-	if tool:IsA('Tool') then
-		if tool.GripPos ~= Vector3.new(0, 0, 0) then
-			tool.GripPos = Vector3.new(0, 0, 0)
-		end
-	end
-end
-
 local function EntityAdded()
 	local backpack = lplr:FindFirstChildWhichIsA('Backpack')
 	if not backpack then
@@ -41,13 +33,6 @@ ToolGrip = vape.Categories.Blatant:CreateModule({
 			ToolGrip:Clean(entitylib.Events.LocalAdded:Connect(EntityAdded))
 			if entitylib.isAlive then
 				task.spawn(EntityAdded)
-			end
-		else
-			local backpack = lplr:FindFirstChildWhichIsA('Backpack')
-			if backpack then
-				for _, tool in backpack:GetChildren() do
-					ResetGrip(tool)
-				end
 			end
 		end
 	end,
