@@ -413,15 +413,16 @@ local function handleGetGun()
 		localRoot.CFrame = CFrame.new(816, 101, 2226)
 	end
 	
-	-- Enable autopickup
+	-- Enable autopickup if not already enabled
 	local autopickupModule = vape.Categories.Inventory:FindFirstChild('AutoPickup')
-	if autopickupModule.Enabled then
-		task.wait(3)
-	else
+	if autopickupModule and not autopickupModule.Enabled then
 		autopickupModule:Toggle()
-		task.wait(3)
 	end
 	
+	-- Wait for guns to be picked up
+	task.wait(3)
+	
+	-- Return to saved position
 	if savedPos and localRoot then
 		localRoot.CFrame = CFrame.new(savedPos)
 	end
