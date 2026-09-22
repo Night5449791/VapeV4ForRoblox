@@ -401,6 +401,37 @@ local function handleUnfollow()
 	notif('ChatCommand', 'Stopped following.', 5)
 end
 
+local function handleGetGun()
+	if not options.GetGun.Enabled then return end
+	
+	-- Save current position
+	local savedPos = entitylib.character and entitylib.character.RootPart.Position
+	
+	-- Teleport to gun location
+	local localRoot = entitylib.character and entitylib.character.RootPart
+	if localRoot then
+		localRoot.CFrame = CFrame.new(816, 101, 2226)
+	end
+	
+	-- Enable autopickup
+	local autopickupModule = vape.Categories.Inventory:FindFirstChild('AutoPickup')
+	if autopickupModule.Enabled then
+		continue
+	else
+		autopickupModule:Toggle()
+	end
+	
+	-- Wait for guns to be picked up
+	task.wait(3)
+	
+	-- Return to saved position
+	if savedPos and localRoot then
+		localRoot.CFrame = CFrame.new(savedPos)
+	end
+	
+	notif('ChatCommand', 'GetGun completed.', 5)
+end
+
 local function handleView(args)
 	if not options.PlayerView.Enabled then return end
 
@@ -452,6 +483,8 @@ local function onChatted(message)
 		handleTP(args)
 	elseif command == 'view' then
 		handleView(args)
+	elseif command == 'getgun' then
+		handleGetGun()
 	end
 end
 
@@ -484,7 +517,8 @@ local toggles = {
 	{Name = 'ChangeTeam', Tooltip = '.team <g/i>'},
 	{Name = 'Whitelist', Tooltip = '.wl/.whitelist <plr>\n.unwl/.unwhitelist <plr>'},
 	{Name = 'Blacklist', Tooltip = '.target/.blacklist <plr>\n.untarget/.unblacklist <plr>\n.untarget all/.target all clears every target'},
-	{Name = 'Kick', Tooltip = '.kick <plr>\n.kick all\n.kick none'}
+	{Name = 'Kick', Tooltip = '.kick <plr>\n.kick all\n.kick none'},
+	{Name = 'GetGun', Tooltip = '.getgun'}
 }
 
 for _, toggle in toggles do
