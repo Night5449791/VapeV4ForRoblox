@@ -28,14 +28,14 @@ local function downloadFile(path, func)
 	return (func or readfile)(path)
 end
 
-vape.Place = 6872274481
+vape.Place = 606849621
 if isfile('newvape/games/'..vape.Place..'.lua') then
-	loadstring(readfile('newvape/games/'..vape.Place..'.lua'), 'bedwars')()
+	loadstring(readfile('newvape/games/'..vape.Place..'.lua'), 'jailbreak')()
 else
 	if not shared.VapeDeveloper then
 		local success, result = pcall(downloadFile, 'newvape/games/'..vape.Place..'.lua')
 		if success and result then
-			loadstring(result, 'bedwars')()
+			loadstring(result, 'jailbreak')()
 		end
 	end
 end
