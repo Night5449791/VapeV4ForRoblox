@@ -115,7 +115,7 @@ end
 
 local function clearAllTargets()
 	local count = clearListValues(vape.Categories.Targets)
-	notif('Blacklist', count > 0 and 'Cleared '..count..' target'..(count == 1 and '.' or 's.') or 'No targets to clear.', 5)
+	notif('Blacklist', count > 0 and 'Cleared '..count..' target'..plural(count) or 'No targets to clear.', 5)
 end
 
 local function setKickEnabled(module, enabled)
@@ -361,6 +361,7 @@ local function handleKick(args)
 	local player = findPlayer(name, true)
 	if not player then
 		notif('KickExploit', 'No player found.', 5, 'warning')
+		module.Options['Mode']:SetValue("All")
 		return
 	end
 
