@@ -52,9 +52,6 @@ local assetService = cloneref(game:GetService('AssetService'))
 local coreGui = cloneref(game:GetService('CoreGui'))
 local stats = cloneref(game:GetService('Stats'))
 
-local isnetworkowner = identifyexecutor and table.find({'AWP', 'Nihon'}, ({identifyexecutor()})[1]) and isnetworkowner or function()
-	return true
-end
 local gameCamera = workspace.CurrentCamera or workspace:FindFirstChildWhichIsA('Camera')
 local lplr = playersService.LocalPlayer
 
@@ -839,19 +836,6 @@ run(function()
 		end,
 		gravity = function(args)
 			workspace.Gravity = tonumber(args[1]) or workspace.Gravity
-		end,
-		chat = function(args)
-			if #args < 1 then return end
-
-			local message = table.concat(args, ' ')
-			if textChatService.ChatVersion == Enum.ChatVersion.TextChatService then
-				local channel = textChatService.ChatInputBarConfiguration.TargetTextChannel
-				if channel then
-					channel:SendAsync(message)
-				end
-			elseif replicatedStorage:FindFirstChild('DefaultChatSystemChatEvents') then
-				replicatedStorage.DefaultChatSystemChatEvents.SayMessageRequest:FireServer(message, 'All')
-			end
 		end,
 		jump = function()
 			if entitylib.isAlive and entitylib.character.Humanoid.FloorMaterial ~= Enum.Material.Air then
