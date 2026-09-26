@@ -1,4 +1,5 @@
 local AutoTeam
+local OnDied
 
 local function joinAvailableTeam()
 	local gui = lplr.PlayerGui:FindFirstChild('TeamsFrame', true)
@@ -19,38 +20,39 @@ AutoTeam = vape.Categories.Utility:CreateModule({
 			joinAvailableTeam()
 		end
 	end,
-	OnDied = {
-		Enabled = false,
-		Connection = nil,
-		Function = function(enabled)
-			if enabled then
-				AutoTeam.OnDied.Connection = lplr.CharacterAdded:Connect(function(character)
-					local humanoid = character:WaitForChild('Humanoid')
+	Tooltip = 'Automatically join a team when joining the server'
+})
+
+OnDied = AutoTeam:CreateToggle({
+	Name = 'OnDied',
+	Default = false,
+	Tooltip = 'Automatically join a team when you die',
+	Function = function(enabled)
+		if enabled then
+			AutoTeam.OnDied.Connection = lplr.CharacterAdded:Connect(function(character)
+				local humanoid = character:WaitForChild('Humanoid')
+				humanoid.Died:Connect(function()
+					if AutoTeam.OnDied.Value then
+						joinAvailableTeam()
+					end
+				end)
+			end)
+			
+			if lplr.Character then
+				local humanoid = lplr.Character:FindFirstChild('Humanoid')
+				if humanoid then
 					humanoid.Died:Connect(function()
-						if AutoTeam.OnDied.Enabled then
+						if AutoTeam.OnDied.Value then
 							joinAvailableTeam()
 						end
 					end)
-				end)
-				
-				if lplr.Character then
-					local humanoid = lplr.Character:FindFirstChild('Humanoid')
-					if humanoid then
-						humanoid.Died:Connect(function()
-							if AutoTeam.OnDied.Enabled then
-								joinAvailableTeam()
-							end
-						end)
-					end
-				end
-			else
-				if AutoTeam.OnDied.Connection then
-					AutoTeam.OnDied.Connection:Disconnect()
-					AutoTeam.OnDied.Connection = nil
 				end
 			end
-		end,
-		Tooltip = 'Automatically join a team when you die'
-	},
-	Tooltip = 'Automatically join a team when joining the server'
+		else
+			if AutoTeam.OnDied.Connection then
+				AutoTeam.OnDied.Connection:Disconnect()
+				AutoTeam.OnDied.Connection = nil
+			end
+		end
+	end
 })
